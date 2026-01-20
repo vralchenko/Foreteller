@@ -41,11 +41,78 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
         if (process.env.GROQ_API_KEY) {
             try {
                 let promptLanguage = 'Russian';
-                if (language === 'en') promptLanguage = 'English';
-                if (language === 'uk') promptLanguage = 'Ukrainian';
-                if (language === 'de') promptLanguage = 'German';
-                if (language === 'es') promptLanguage = 'Spanish';
-                if (language === 'fr') promptLanguage = 'French';
+                let headers = {
+                    intro: 'Космический чертеж',
+                    numerology: 'Числовой код души',
+                    zodiac: 'Дух животных и звезды',
+                    moon: 'Лунный эмоциональный гобелен',
+                    love: 'Любовь, отношения и совместимость',
+                    career: 'Карьера, успех и финансовый рост',
+                    health: 'Здоровье и жизненная энергия',
+                    destiny: 'Высшее предназначение'
+                };
+
+                if (language === 'en') {
+                    promptLanguage = 'English';
+                    headers = {
+                        intro: 'The Cosmic Blueprint',
+                        numerology: 'The Numerical Code of Soul',
+                        zodiac: 'The Animal Spirit & Stars',
+                        moon: 'Lunar Emotional Tapestry',
+                        love: 'Love, Relationships & Compatibility',
+                        career: 'Career, Success & Financial Growth',
+                        health: 'Health & Vital Energy',
+                        destiny: 'The Ultimate Destiny'
+                    };
+                } else if (language === 'uk') {
+                    promptLanguage = 'Ukrainian';
+                    headers = {
+                        intro: 'Космічне креслення',
+                        numerology: 'Числовий код душі',
+                        zodiac: 'Дух тварин і зірки',
+                        moon: 'Місячне емоційне мереживо',
+                        love: 'Кохання, стосунки та сумісність',
+                        career: 'Кар’єра, успіх та фінансове зростання',
+                        health: 'Здоров’я та життєва енергія',
+                        destiny: 'Вище призначення'
+                    };
+                } else if (language === 'de') {
+                    promptLanguage = 'German';
+                    headers = {
+                        intro: 'Der kosmische Bauplan',
+                        numerology: 'Der numerische Code der Seele',
+                        zodiac: 'Tiergeist & Sterne',
+                        moon: 'Mond-Emotionsgeflecht',
+                        love: 'Liebe, Beziehungen & Kompatibilität',
+                        career: 'Karriere, Erfolg & finanzielles Wachstum',
+                        health: 'Gesundheit & Vitalenergie',
+                        destiny: 'Das ultimative Schicksal'
+                    };
+                } else if (language === 'es') {
+                    promptLanguage = 'Spanish';
+                    headers = {
+                        intro: 'El plano cósmico',
+                        numerology: 'El código numérico del alma',
+                        zodiac: 'El espíritu animal y las estrellas',
+                        moon: 'Tapiz emocional lunar',
+                        love: 'Amor, relaciones y compatibilidad',
+                        career: 'Carrera, éxito y crecimiento financiero',
+                        health: 'Salud y energía vital',
+                        destiny: 'El destino final'
+                    };
+                } else if (language === 'fr') {
+                    promptLanguage = 'French';
+                    headers = {
+                        intro: 'Le plan cosmique',
+                        numerology: 'Le code numérique de l\'âme',
+                        zodiac: 'L\'esprit animal et les étoiles',
+                        moon: 'Tapisserie émotionnelle lunaire',
+                        love: 'Amour, relations et compatibilité',
+                        career: 'Carrière, succès et croissance financière',
+                        health: 'Santé et énergie vitale',
+                        destiny: 'Le destin ultime'
+                    };
+                }
 
                 const prompt = `
           ACT AS AN EXPERT ASTROLOGER, NUMEROLOGIST, AND COSMIC GUIDE. 
@@ -61,19 +128,19 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
           YOUR TASK:
           1. Write a comprehensive analysis (at least 800-1000 words).
           2. Use a sophisticated, mystic, yet professional tone.
-          3. Deeply analyze how these different systems overlap (e.g., how the ${basicInfo.zodiac} nature interacts with the ${basicInfo.chineseZodiac} energy).
-          4. Detailed Pythagorean analysis: Don't just list numbers. Explain their combinations, horizontal/vertical lines, and diagonals of the square.
+          3. Deeply analyze how these different systems overlap.
+          4. Detailed Pythagorean analysis explaining combinations, lines, and diagonals.
           5. Address the specific aspects of being a ${gender}.
 
-          REQUIRED SECTIONS (Use <h3> for titles):
-          - <h3>🌌 The Cosmic Blueprint</h3>: A grand introduction merging all systems.
-          - <h3>📐 The Numerical Code of Soul</h3>: Deep dive into the Pythagoras Square, explaining the balance of energy, health, and character.
-          - <h3>🐉 The Animal Spirit & Stars</h3>: Intersection of Western and Chinese zodiacs.
-          - <h3>🌙 Lunar Emotional Tapestry</h3>: How the moon phase affects the inner world and intuition.
-          - <h3>❤️ Love, Relationships & Compatibility</h3>: Detailed advice for personal life.
-          - <h3>💼 Career, Success & Financial Growth</h3>: Professional path and potential.
-          - <h3>🌿 Health & Vital Energy</h3>: Recommendations based on the energy balance.
-          - <h3>🔮 The Ultimate Destiny</h3>: A powerful closing about the soul's mission in this incarnation.
+          REQUIRED SECTIONS (You MUST use these EXACT titles in <h3> tags):
+          - <h3>🌌 ${headers.intro}</h3>
+          - <h3>📐 ${headers.numerology}</h3>
+          - <h3>🐉 ${headers.zodiac}</h3>
+          - <h3>🌙 ${headers.moon}</h3>
+          - <h3>❤️ ${headers.love}</h3>
+          - <h3>💼 ${headers.career}</h3>
+          - <h3>🌿 ${headers.health}</h3>
+          - <h3>🔮 ${headers.destiny}</h3>
 
           FORMATTING RULES:
           - Use HTML tags (<h3>, <p>, <strong>, <ul>, <li>). 
