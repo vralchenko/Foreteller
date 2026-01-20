@@ -3,6 +3,6 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "build": "cd client && npm install --legacy-peer-deps && npm run build"
+        "build": "cd client && npm install --legacy-peer-deps && npm run build && mv dist ../public"
     }
 }
