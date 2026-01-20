@@ -17,11 +17,12 @@ interface AnalyzeRequest {
     time?: string;
     place?: string;
     language?: string;
+    gender?: 'male' | 'female';
 }
 
 app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Response) => {
     try {
-        const { date, time, place, language = 'uk' } = req.body;
+        const { date, time, place, language = 'uk', gender = 'male' } = req.body;
 
         if (!date) {
             return res.status(400).json({ error: 'Date is required' });
@@ -32,12 +33,11 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
             chineseZodiac: getChineseZodiac(date),
             pythagoras: calculatePythagoras(date),
             moon: getMoonPhaseInfo(date),
-            input: { date, time, place }
+            input: { date, time, place, gender }
         };
 
         let aiAnalysis: string | null = null;
 
-        // If Groq is available (or customized via env), generate a detailed analysis
         if (process.env.GROQ_API_KEY) {
             try {
                 let promptLanguage = 'Russian';
@@ -48,19 +48,38 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
                 if (language === 'fr') promptLanguage = 'French';
 
                 const prompt = `
-          Analyze the character of a person born on ${date} at ${time || 'unknown time'} in ${place || 'unknown place'}.
+          ACT AS AN EXPERT ASTROLOGER, NUMEROLOGIST, AND COSMIC GUIDE. 
+          Provide a DEEP, VOLUMINOUS, AND DETAILED character analysis for a ${gender} born on ${date} at ${time || 'unknown time'} in ${place || 'unknown place'}.
           
-          Data:
-          - Zodiac: ${basicInfo.zodiac}
-          - Chinese Zodiac: ${basicInfo.chineseZodiac}
-          - Pythagoras Square: ${JSON.stringify(basicInfo.pythagoras)}
-          - Moon Phase: ${basicInfo.moon.phase}
-          
-          Please provide a mystic and insightful description of their personality, strengths, weaknesses, and potential destiny.
-          Keep it engaging and slightly esoteric but grounded in the data provided. 
-          Language: ${promptLanguage}.
-          Format: HTML (just the content tags, no html/body wrappers) suitable for embedding in a div. 
-          Structure with <h3> headers for sections.
+          TECHNICAL DATA TO INTERPRET:
+          - WESTERN ZODIAC: ${basicInfo.zodiac}
+          - CHINESE HOROSCOPE: ${basicInfo.chineseZodiac}
+          - PYTHAGORAS SQUARE (Psychomatrix): ${JSON.stringify(basicInfo.pythagoras.square)}
+          - PYTHAGORAS NUMEROLOGY META: ${JSON.stringify(basicInfo.pythagoras.meta)}
+          - LUNAR PHASE: ${basicInfo.moon.phase} (Emoji: ${basicInfo.moon.emoji})
+
+          YOUR TASK:
+          1. Write a comprehensive analysis (at least 800-1000 words).
+          2. Use a sophisticated, mystic, yet professional tone.
+          3. Deeply analyze how these different systems overlap (e.g., how the ${basicInfo.zodiac} nature interacts with the ${basicInfo.chineseZodiac} energy).
+          4. Detailed Pythagorean analysis: Don't just list numbers. Explain their combinations, horizontal/vertical lines, and diagonals of the square.
+          5. Address the specific aspects of being a ${gender}.
+
+          REQUIRED SECTIONS (Use <h3> for titles):
+          - <h3>🌌 The Cosmic Blueprint</h3>: A grand introduction merging all systems.
+          - <h3>📐 The Numerical Code of Soul</h3>: Deep dive into the Pythagoras Square, explaining the balance of energy, health, and character.
+          - <h3>🐉 The Animal Spirit & Stars</h3>: Intersection of Western and Chinese zodiacs.
+          - <h3>🌙 Lunar Emotional Tapestry</h3>: How the moon phase affects the inner world and intuition.
+          - <h3>❤️ Love, Relationships & Compatibility</h3>: Detailed advice for personal life.
+          - <h3>💼 Career, Success & Financial Growth</h3>: Professional path and potential.
+          - <h3>🌿 Health & Vital Energy</h3>: Recommendations based on the energy balance.
+          - <h3>🔮 The Ultimate Destiny</h3>: A powerful closing about the soul's mission in this incarnation.
+
+          FORMATTING RULES:
+          - Use HTML tags (<h3>, <p>, <strong>, <ul>, <li>). 
+          - NO <html> or <body> tags.
+          - Language: ${promptLanguage}.
+          - Make it feel like a premium, personalized report.
         `;
 
                 const model = process.env.AI_MODEL_NAME || 'llama3-8b-8192';
@@ -69,7 +88,8 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
                 const response = await axios.post(apiUrl, {
                     model: model,
                     messages: [{ role: 'user', content: prompt }],
-                    temperature: 0.7
+                    temperature: 0.7,
+                    max_tokens: 3000
                 }, {
                     headers: {
                         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
