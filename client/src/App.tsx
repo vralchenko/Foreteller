@@ -1,0 +1,280 @@
+import { useState, useEffect, useRef } from 'react';
+import {
+  ThemeProvider,
+  CssBaseline,
+  Container,
+  Box,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Button,
+  Grid,
+  CircularProgress,
+  Alert,
+  useMediaQuery,
+  Card,
+  CardContent,
+} from '@mui/material';
+import { Calculate as CalculateIcon, PictureAsPdf as PdfIcon } from '@mui/icons-material';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+import { darkTheme } from './theme';
+import { FormData, AnalysisResult, Language } from './types';
+import { TRANSLATIONS, zodiacEmoji, chineseZodiacEmoji } from './constants/translations';
+import { translateZodiac, translateChineseZodiac } from './utils/translations';
+import { BirthForm } from './components/BirthForm';
+import { ResultCard } from './components/ResultCard';
+import { PythagorasGrid } from './components/PythagorasGrid';
+
+function App() {
+  const [lang, setLang] = useState<Language>('en');
+  const t = TRANSLATIONS[lang];
+  const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
+
+  const [formData, setFormData] = useState<FormData>({
+    date: '',
+    time: '',
+    place: t.defaultPlace,
+    gender: 'male',
+  });
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const defaults = Object.values(TRANSLATIONS).map((tr) => tr.defaultPlace);
+    if (!formData.place || defaults.includes(formData.place)) {
+      setFormData((prev) => ({ ...prev, place: t.defaultPlace }));
+    }
+  }, [lang, t.defaultPlace, formData.place]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.date) return;
+
+    setLoading(true);
+    setError('');
+    setResult(null);
+
+    try {
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, language: lang }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setResult(data);
+      } else {
+        setError(data.error || 'Something went wrong');
+      }
+    } catch (err) {
+      setError(t.error);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!resultsRef.current) return;
+
+    try {
+      const canvas = await html2canvas(resultsRef.current, {
+        scale: 2,
+        backgroundColor: '#1e1b4b',
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`foreteller-${formData.date}.pdf`);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+    }
+  };
+
+  return (
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+        }}
+      >
+        <Box sx={{ flex: 1, pb: 4, overflow: 'auto' }}>
+          <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+            {/* Language Switcher */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+              <ToggleButtonGroup
+                value={lang}
+                exclusive
+                onChange={(_, newLang) => newLang && setLang(newLang)}
+                size={isMobile ? 'small' : 'medium'}
+              >
+                <ToggleButton value="en">EN</ToggleButton>
+                <ToggleButton value="de">DE</ToggleButton>
+                <ToggleButton value="fr">FR</ToggleButton>
+                <ToggleButton value="es">ES</ToggleButton>
+                <ToggleButton value="uk">UA</ToggleButton>
+                <ToggleButton value="ru">RU</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
+
+            {/* Header */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontSize: { xs: '2rem', md: '3.5rem' },
+                  background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  mb: 1,
+                }}
+              >
+                {t.title}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ letterSpacing: 1 }}>
+                {t.subtitle}
+              </Typography>
+            </Box>
+
+            {/* Form */}
+            <BirthForm
+              formData={formData}
+              translations={t}
+              loading={loading}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+            />
+
+            {/* Error */}
+            {error && (
+              <Alert severity="error" sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
+                {error}
+              </Alert>
+            )}
+
+            {/* Loading */}
+            {loading && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+                <CircularProgress size={60} />
+              </Box>
+            )}
+
+            {/* Results */}
+            {result && (
+              <Box ref={resultsRef}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<PdfIcon />}
+                    onClick={handleDownloadPDF}
+                    sx={{ borderRadius: 8 }}
+                  >
+                    {t.downloadPdf}
+                  </Button>
+                </Box>
+                <Grid container spacing={3}>
+                  {/* Zodiac */}
+                  <Grid item xs={12} sm={6} md={4}>
+                    <ResultCard
+                      title={t.zodiac}
+                      emoji={zodiacEmoji[result.zodiac] || '✨'}
+                      value={translateZodiac(result.zodiac, lang)}
+                    />
+                  </Grid>
+
+                  {/* Chinese Zodiac */}
+                  <Grid item xs={12} sm={6} md={4}>
+                    <ResultCard
+                      title={t.chinese}
+                      emoji={chineseZodiacEmoji[result.chineseZodiac] || '🐉'}
+                      value={translateChineseZodiac(result.chineseZodiac, lang)}
+                    />
+                  </Grid>
+
+                  {/* Moon */}
+                  <Grid item xs={12} sm={6} md={4}>
+                    <ResultCard
+                      title={t.moon}
+                      emoji={result.moon.emoji}
+                      value={result.moon.phase}
+                    />
+                  </Grid>
+
+                  {/* Pythagoras Square */}
+                  <Grid item xs={12}>
+                    <Card>
+                      <CardContent>
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                          <CalculateIcon sx={{ fontSize: 60, color: 'primary.main' }} />
+                          <Typography variant="h5" sx={{ mt: 1, fontWeight: 600 }}>
+                            {t.pythagoras}
+                          </Typography>
+                        </Box>
+                        <PythagorasGrid square={result.pythagoras.square} />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* AI Analysis */}
+                  <Grid item xs={12}>
+                    <Card>
+                      <CardContent>
+                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                          {t.analysis}
+                        </Typography>
+                        <Box
+                          dangerouslySetInnerHTML={{
+                            __html: result.aiAnalysis || '<p>AI Analysis unavailable</p>',
+                          }}
+                          sx={{
+                            '& h3': { color: 'primary.main', mt: 3, mb: 1, fontSize: '1.3rem' },
+                            '& p': { mb: 2, lineHeight: 1.7 },
+                          }}
+                        />
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+              </Box>
+            )}
+          </Container>
+        </Box>
+
+        {/* Footer */}
+        <Box
+          component="footer"
+          sx={{
+            py: 1.5,
+            textAlign: 'center',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            bgcolor: 'transparent',
+          }}
+        >
+          <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.6 }}>
+            © 2026 Viktor Ralchenko
+          </Typography>
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+}
+
+export default App;

@@ -1,0 +1,154 @@
+import { Language } from '../types';
+
+export const ZODIAC_TRANSLATIONS: Record<Language, Record<string, string>> = {
+    en: { Aries: "Aries", Taurus: "Taurus", Gemini: "Gemini", Cancer: "Cancer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Scorpio", Sagittarius: "Sagittarius", Capricorn: "Capricorn", Aquarius: "Aquarius", Pisces: "Pisces" },
+    ru: { Aries: "Овен", Taurus: "Телец", Gemini: "Близнецы", Cancer: "Рак", Leo: "Лев", Virgo: "Дева", Libra: "Весы", Scorpio: "Скорпион", Sagittarius: "Стрелец", Capricorn: "Козерог", Aquarius: "Водолей", Pisces: "Рыбы" },
+    uk: { Aries: "Овен", Taurus: "Телець", Gemini: "Близнюки", Cancer: "Рак", Leo: "Лев", Virgo: "Діва", Libra: "Терези", Scorpio: "Скорпіон", Sagittarius: "Стрілець", Capricorn: "Козеріг", Aquarius: "Водолій", Pisces: "Риби" },
+    de: { Aries: "Widder", Taurus: "Stier", Gemini: "Zwillinge", Cancer: "Krebs", Leo: "Löwe", Virgo: "Jungfrau", Libra: "Waage", Scorpio: "Skorpion", Sagittarius: "Schütze", Capricorn: "Steinbock", Aquarius: "Wassermann", Pisces: "Fische" },
+    es: { Aries: "Aries", Taurus: "Tauro", Gemini: "Géminis", Cancer: "Cáncer", Leo: "Leo", Virgo: "Virgo", Libra: "Libra", Scorpio: "Escorpio", Sagittarius: "Sagitario", Capricorn: "Capricornio", Aquarius: "Acuario", Pisces: "Piscis" },
+    fr: { Aries: "Bélier", Taurus: "Taureau", Gemini: "Gémeaux", Cancer: "Cancer", Leo: "Lion", Virgo: "Vierge", Libra: "Balance", Scorpio: "Scorpion", Sagittarius: "Sagittaire", Capricorn: "Capricorne", Aquarius: "Verseau", Pisces: "Poissons" }
+};
+
+export const CHINESE_ZODIAC_TRANSLATIONS: Record<Language, Record<string, string>> = {
+    en: { Rat: "Rat", Ox: "Ox", Tiger: "Tiger", Rabbit: "Rabbit", Dragon: "Dragon", Snake: "Snake", Horse: "Horse", Goat: "Goat", Monkey: "Monkey", Rooster: "Rooster", Dog: "Dog", Pig: "Pig" },
+    ru: { Rat: "Крыса", Ox: "Бык", Tiger: "Тигр", Rabbit: "Кролик", Dragon: "Дракон", Snake: "Змея", Horse: "Лошадь", Goat: "Коза", Monkey: "Обезьяна", Rooster: "Петух", Dog: "Собака", Pig: "Свинья" },
+    uk: { Rat: "Щур", Ox: "Бик", Tiger: "Тигр", Rabbit: "Кролик", Dragon: "Дракон", Snake: "Змія", Horse: "Кінь", Goat: "Коза", Monkey: "Мавпа", Rooster: "Півень", Dog: "Собака", Pig: "Свиня" },
+    de: { Rat: "Ratte", Ox: "Büffel", Tiger: "Tiger", Rabbit: "Hase", Dragon: "Drache", Snake: "Schlange", Horse: "Pferd", Goat: "Ziege", Monkey: "Affe", Rooster: "Hahn", Dog: "Hund", Pig: "Schwein" },
+    es: { Rat: "Rata", Ox: "Buey", Tiger: "Tigre", Rabbit: "Conejo", Dragon: "Dragón", Snake: "Serpiente", Horse: "Caballo", Goat: "Cabra", Monkey: "Mono", Rooster: "Gallo", Dog: "Perro", Pig: "Cerdo" },
+    fr: { Rat: "Rat", Ox: "Bœuf", Tiger: "Tigre", Rabbit: "Lapin", Dragon: "Dragon", Snake: "Serpent", Horse: "Cheval", Goat: "Chèvre", Monkey: "Singe", Rooster: "Coq", Dog: "Chien", Pig: "Cochon" }
+};
+
+export const TRANSLATIONS = {
+    en: {
+        title: 'Foreteller',
+        subtitle: 'WISDOM OF STARS AND NUMBERS',
+        dob: 'Date of Birth',
+        time: 'Time (optional)',
+        place: 'Place of Birth',
+        gender: 'Gender',
+        male: 'Male',
+        female: 'Female',
+        submit: 'Reveal the Mystery',
+        loading: 'Consulting the stars...',
+        zodiac: 'Zodiac Sign',
+        chinese: 'Chinese Horoscope',
+        pythagoras: 'Pythagoras Square',
+        moon: 'Moon Phase',
+        analysis: '🔮 Astral Analysis',
+        error: 'Connection to astral plane failed',
+        defaultPlace: 'Kyiv, Ukraine',
+        downloadPdf: 'Download PDF'
+    },
+    de: {
+        title: 'Foreteller',
+        subtitle: 'WEISHEIT DER STERNE UND ZAHLEN',
+        dob: 'Geburtsdatum',
+        time: 'Zeit (optional)',
+        place: 'Geburtsort',
+        gender: 'Geschlecht',
+        male: 'Männlich',
+        female: 'Weiblich',
+        submit: 'Das Geheimnis enthüllen',
+        loading: 'Konsultiere die Sterne...',
+        zodiac: 'Sternzeichen',
+        chinese: 'Chinesisches Horoskop',
+        pythagoras: 'Pythagoras-Quadrat',
+        moon: 'Mondphase',
+        analysis: '🔮 Astrale Analyse',
+        error: 'Verbindung zur Astralebene fehlgeschlagen',
+        defaultPlace: 'Berlin, Deutschland',
+        downloadPdf: 'PDF herunterladen'
+    },
+    fr: {
+        title: 'Foreteller',
+        subtitle: 'SAGESSE DES ÉTOILES ET DES NOMBRES',
+        dob: 'Date de naissance',
+        time: 'Heure (facultatif)',
+        place: 'Lieu de naissance',
+        gender: 'Sexe',
+        male: 'Homme',
+        female: 'Femme',
+        submit: 'Révéler le mystère',
+        loading: 'Consultation des étoiles...',
+        zodiac: 'Signe du Zodiaque',
+        chinese: 'Horoscope Chinois',
+        pythagoras: 'Carré de Pythagore',
+        moon: 'Phase de Lune',
+        analysis: '🔮 Analyse Astrale',
+        error: 'Échec de la connexion au plan astral',
+        defaultPlace: 'Paris, France',
+        downloadPdf: 'Télécharger PDF'
+    },
+    es: {
+        title: 'Foreteller',
+        subtitle: 'SABIDURÍA DE LAS ESTRELLAS Y LOS NÚMEROS',
+        dob: 'Fecha de nacimiento',
+        time: 'Hora (opcional)',
+        place: 'Lugar de nacimiento',
+        gender: 'Sexo',
+        male: 'Masculino',
+        female: 'Femenino',
+        submit: 'Revelar el misterio',
+        loading: 'Consultando las estrellas...',
+        zodiac: 'Signo del Zodiaco',
+        chinese: 'Horóscopo Chino',
+        pythagoras: 'Cuadrado de Pitágoras',
+        moon: 'Fase Lunar',
+        analysis: '🔮 Análisis Astral',
+        error: 'Conexión con el plano astral fallida',
+        defaultPlace: 'Madrid, España',
+        downloadPdf: 'Descargar PDF'
+    },
+    uk: {
+        title: 'Foreteller',
+        subtitle: 'МУДРІСТЬ ЗІРОК І ЧИСЕЛ',
+        dob: 'Дата народження',
+        time: 'Час (необов\'язково)',
+        place: 'Місце народження',
+        gender: 'Стать',
+        male: 'Чоловік',
+        female: 'Жінка',
+        submit: 'Розкрити Таємницю',
+        loading: 'Вивчаю зірки...',
+        zodiac: 'Знак Зодіаку',
+        chinese: 'Китайський Гороскоп',
+        pythagoras: 'Квадрат Піфагора',
+        moon: 'Фаза Місяця',
+        analysis: '🔮 Астральний Аналіз',
+        error: 'Помилка з\'єднання з астралом',
+        defaultPlace: 'Київ, Україна',
+        downloadPdf: 'Завантажити PDF'
+    },
+    ru: {
+        title: 'Foreteller',
+        subtitle: 'МУДРОСТЬ ЗВЕЗД И ЧИСЕЛ',
+        dob: 'Дата рождения',
+        time: 'Время (необязательно)',
+        place: 'Место рождения',
+        gender: 'Пол',
+        male: 'Мужской',
+        female: 'Женский',
+        submit: 'Раскрыть Тайну',
+        loading: 'Изучаю звезды...',
+        zodiac: 'Знак Зодиака',
+        chinese: 'Китайский Гороскоп',
+        pythagoras: 'Квадрат Пифагора',
+        moon: 'Фаза Луны',
+        analysis: '🔮 Астральный Анализ',
+        error: 'Ошибка соединения с астралом',
+        defaultPlace: 'Киев, Украина',
+        downloadPdf: 'Скачать PDF'
+    }
+};
+
+export const zodiacEmoji: Record<string, string> = {
+    'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
+    'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
+    'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓'
+};
+
+export const chineseZodiacEmoji: Record<string, string> = {
+    'Rat': '🐀', 'Ox': '🐂', 'Tiger': '🐅', 'Rabbit': '🐇',
+    'Dragon': '🐉', 'Snake': '🐍', 'Horse': '🐎', 'Goat': '🐐',
+    'Monkey': '🐒', 'Rooster': '🐓', 'Dog': '🐕', 'Pig': '🐖'
+};
