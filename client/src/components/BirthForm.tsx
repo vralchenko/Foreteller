@@ -48,9 +48,11 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                             <TextField
                                 fullWidth
                                 label={translations.place}
+                                placeholder={translations.defaultPlace}
                                 name="place"
                                 value={formData.place}
                                 onChange={onChange}
+                                InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={3}>

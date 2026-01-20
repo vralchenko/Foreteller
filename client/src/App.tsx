@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   ThemeProvider,
   CssBaseline,
@@ -35,20 +35,13 @@ function App() {
   const [formData, setFormData] = useState<FormData>({
     date: '',
     time: '',
-    place: t.defaultPlace,
+    place: '',
     gender: 'male',
   });
   const resultsRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    const defaults = Object.values(TRANSLATIONS).map((tr) => tr.defaultPlace);
-    if (!formData.place || defaults.includes(formData.place)) {
-      setFormData((prev) => ({ ...prev, place: t.defaultPlace }));
-    }
-  }, [lang, t.defaultPlace, formData.place]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -91,14 +84,30 @@ function App() {
         scale: 2,
         backgroundColor: '#1e1b4b',
         logging: false,
+        useCORS: true,
       });
 
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pdfPageHeight = pdf.internal.pageSize.getHeight();
+      const imgHeightMM = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      let heightLeft = imgHeightMM;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
+      heightLeft -= pdfPageHeight;
+
+      // Add subsequent pages if necessary
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeightMM;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
+        heightLeft -= pdfPageHeight;
+      }
+
       pdf.save(`foreteller-${formData.date}.pdf`);
     } catch (error) {
       console.error('PDF generation error:', error);
