@@ -6,8 +6,7 @@ import {
     Button,
     ToggleButton,
     ToggleButtonGroup,
-    Typography,
-    Box
+    Typography
 } from '@mui/material';
 import { Male as MaleIcon, Female as FemaleIcon } from '@mui/icons-material';
 import { FormData, Translations } from '../types';
@@ -48,6 +47,9 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 onChange={onChange}
                                 required
                                 InputLabelProps={{ shrink: true }}
+                                inputProps={{
+                                    max: new Date().toISOString().split('T')[0]
+                                }}
                             />
                         </Grid>
                         <Grid item xs={12} sm={3}>
@@ -73,28 +75,38 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                             />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                            <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block', ml: 1 }}>
-                                    {translations.gender}
-                                </Typography>
-                                <ToggleButtonGroup
-                                    value={formData.gender}
-                                    exclusive
-                                    onChange={handleGenderChange}
-                                    fullWidth
-                                    size="medium"
-                                    sx={{ height: 56 }}
-                                >
-                                    <ToggleButton value="male" sx={{ gap: 1 }}>
-                                        <MaleIcon />
-                                        {translations.male}
-                                    </ToggleButton>
-                                    <ToggleButton value="female" sx={{ gap: 1 }}>
-                                        <FemaleIcon />
-                                        {translations.female}
-                                    </ToggleButton>
-                                </ToggleButtonGroup>
-                            </Box>
+                            <ToggleButtonGroup
+                                value={formData.gender}
+                                exclusive
+                                onChange={handleGenderChange}
+                                fullWidth
+                                size="small"
+                                sx={{
+                                    height: 56,
+                                    bgcolor: 'rgba(255,255,255,0.05)',
+                                    '& .MuiToggleButton-root': {
+                                        color: 'rgba(255,255,255,0.5)',
+                                        border: '1px solid rgba(255,255,255,0.23)',
+                                        '&.Mui-selected': {
+                                            color: '#fff',
+                                            bgcolor: 'rgba(168, 85, 247, 0.2)',
+                                            borderColor: '#a855f7',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(168, 85, 247, 0.3)',
+                                            }
+                                        }
+                                    }
+                                }}
+                            >
+                                <ToggleButton value="male" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
+                                    <MaleIcon fontSize="small" />
+                                    <Typography variant="body2">{translations.male}</Typography>
+                                </ToggleButton>
+                                <ToggleButton value="female" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
+                                    <FemaleIcon fontSize="small" />
+                                    <Typography variant="body2">{translations.female}</Typography>
+                                </ToggleButton>
+                            </ToggleButtonGroup>
                         </Grid>
                         <Grid item xs={12}>
                             <Button
