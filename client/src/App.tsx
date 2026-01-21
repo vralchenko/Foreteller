@@ -132,45 +132,70 @@ function App() {
 
     if (!result?.aiAnalysis) return;
 
-    // Strip HTML tags for speech
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = result.aiAnalysis;
-    let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
+    try {
+      if (!synth) {
+        throw new Error('Speech synthesis not supported in this browser');
+      }
 
-    // Remove emojis, symbols and extras
-    textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
-    textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
+      // Prepare text
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = result.aiAnalysis;
+      let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
 
-    if (!textToSpeak) return;
+      // Clean text
+      textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
+      textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
 
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      if (!textToSpeak) return;
 
-    // Set language for speech
-    const langMap: Record<string, string> = {
-      'en': 'en-US',
-      'ru': 'ru-RU',
-      'uk': 'uk-UA',
-      'de': 'de-DE',
-      'fr': 'fr-FR',
-      'es': 'es-ES'
-    };
+      // Mobile fix: split text into small chunks by punctuation
+      const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
 
-    utterance.lang = langMap[lang] || 'en-US';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
+      setIsSpeaking(true);
 
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      let currentIdx = 0;
 
-    // Immediate feedback for UI
-    setIsSpeaking(true);
+      const speakNext = () => {
+        if (currentIdx >= sentences.length || !isSpeaking) {
+          setIsSpeaking(false);
+          return;
+        }
 
-    // Start synthesis
-    synth.speak(utterance);
+        const utterance = new SpeechSynthesisUtterance(sentences[currentIdx].trim());
 
-    // Some mobile browsers start in a paused state
-    if (synth.paused) {
-      synth.resume();
+        const langMap: Record<string, string> = {
+          'en': 'en-US', 'ru': 'ru-RU', 'uk': 'uk-UA',
+          'de': 'de-DE', 'fr': 'fr-FR', 'es': 'es-ES'
+        };
+        utterance.lang = langMap[lang] || 'en-US';
+        utterance.rate = 1.0;
+
+        utterance.onend = () => {
+          currentIdx++;
+          if (currentIdx < sentences.length) {
+            speakNext();
+          } else {
+            setIsSpeaking(false);
+          }
+        };
+
+        utterance.onerror = (e) => {
+          console.error('Speech error:', e);
+          setError(`Audio Error: ${e.error}. Please ensure hardware sound is ON and not in Silent Mode.`);
+          setIsSpeaking(false);
+          synth.cancel();
+        };
+
+        synth.speak(utterance);
+        if (synth.paused) synth.resume();
+      };
+
+      synth.cancel();
+      speakNext();
+
+    } catch (err: any) {
+      setError(`Audio Feature Error: ${err.message}`);
+      setIsSpeaking(false);
     }
   };
 
