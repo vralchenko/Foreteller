@@ -51,7 +51,6 @@ function App() {
   const isSpeakingRef = useRef(false);
   const utterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const [error, setError] = useState('');
-  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -190,9 +189,6 @@ function App() {
         if (voice) {
           utterance.voice = voice;
         }
-
-        // Update debug info with selected voice
-        setDebugInfo(`Voices: ${voices.length}, Lang: ${lang}, Voice: ${voice?.name || 'default'}`);
 
         utterance.onend = () => {
           currentIdx++;
@@ -369,11 +365,6 @@ function App() {
                   </Button>
                 </Box>
 
-                {debugInfo && (
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', textAlign: 'center', mb: 2 }}>
-                    Debug: {debugInfo}
-                  </Typography>
-                )}
                 <Grid container spacing={3}>
                   {/* Zodiac */}
                   <Grid item xs={12} sm={6} md={4}>
