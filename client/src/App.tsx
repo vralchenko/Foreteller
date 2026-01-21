@@ -48,6 +48,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const isSpeakingRef = useRef(false);
+  const utterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const [error, setError] = useState('');
   const [debugInfo, setDebugInfo] = useState<string>('');
 
@@ -100,6 +102,7 @@ function App() {
     setResult(null);
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
+    isSpeakingRef.current = false;
 
     try {
       const response = await fetch('/api/analyze', {
@@ -128,6 +131,7 @@ function App() {
     if (isSpeaking) {
       synth.cancel();
       setIsSpeaking(false);
+      isSpeakingRef.current = false;
       return;
     }
 
@@ -138,6 +142,7 @@ function App() {
         throw new Error('Speech synthesis not supported in this browser');
       }
 
+      // Important: some browsers need voices to be loaded
       const allVoices = synth.getVoices();
       setDebugInfo(`Voices: ${allVoices.length}, Lang: ${lang}`);
 
@@ -146,60 +151,77 @@ function App() {
       tempDiv.innerHTML = result.aiAnalysis;
       let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
 
-      // Clean text
+      // Clean text: remove emojis and normalize spaces
       textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
       textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
 
       if (!textToSpeak) return;
 
-      // Mobile fix: split text into small chunks by punctuation
+      // Mobile/Stability fix: split text into small chunks
       const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
 
       setIsSpeaking(true);
+      isSpeakingRef.current = true;
+      utterancesRef.current = []; // Clear previous references
 
       let currentIdx = 0;
 
       const speakNext = () => {
-        if (currentIdx >= sentences.length || !isSpeaking) {
+        if (currentIdx >= sentences.length || !isSpeakingRef.current) {
           setIsSpeaking(false);
+          isSpeakingRef.current = false;
           return;
         }
 
         const utterance = new SpeechSynthesisUtterance(sentences[currentIdx].trim());
+        utterancesRef.current.push(utterance); // Prevent GC
 
         const langMap: Record<string, string> = {
           'en': 'en-US', 'ru': 'ru-RU', 'uk': 'uk-UA',
           'de': 'de-DE', 'fr': 'fr-FR', 'es': 'es-ES'
         };
-        utterance.lang = langMap[lang] || 'en-US';
+        const targetLang = langMap[lang] || 'en-US';
+        utterance.lang = targetLang;
         utterance.rate = 1.0;
+
+        // Try to pick a specific voice for the language
+        const voices = synth.getVoices();
+        const voice = voices.find(v => v.lang === targetLang) ||
+          voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+        if (voice) {
+          utterance.voice = voice;
+        }
 
         utterance.onend = () => {
           currentIdx++;
-          if (currentIdx < sentences.length) {
+          if (isSpeakingRef.current) {
             speakNext();
-          } else {
-            setIsSpeaking(false);
           }
         };
 
         utterance.onerror = (e) => {
           console.error('Speech error:', e);
-          setError(`Audio Error: ${e.error}. Please ensure hardware sound is ON and not in Silent Mode.`);
+          if (e.error !== 'interrupted') {
+            setError(`Audio Error: ${e.error}.`);
+          }
           setIsSpeaking(false);
-          synth.cancel();
+          isSpeakingRef.current = false;
         };
 
         synth.speak(utterance);
-        if (synth.paused) synth.resume();
       };
 
       synth.cancel();
-      speakNext();
+      // Small timeout to ensure cancel is processed
+      setTimeout(() => {
+        if (synth.paused) synth.resume();
+        speakNext();
+      }, 50);
 
     } catch (err: any) {
       setError(`Audio Feature Error: ${err.message}`);
       setIsSpeaking(false);
+      isSpeakingRef.current = false;
     }
   };
 
@@ -264,6 +286,7 @@ function App() {
                     setLang(newLang);
                     window.speechSynthesis.cancel();
                     setIsSpeaking(false);
+                    isSpeakingRef.current = false;
                   }
                 }}
                 size={isMobile ? 'small' : 'medium'}
