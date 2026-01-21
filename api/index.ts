@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { createClient } from '@supabase/supabase-js';
 import { calculatePythagoras, getZodiacSign, getChineseZodiac, getMoonPhaseInfo } from './numerology.js';
 import { generateAnalysisPrompt } from './prompts.js';
 
@@ -9,6 +10,11 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Initialize Supabase
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = (supabaseUrl && supabaseServiceKey) ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 app.use(cors());
 app.use(express.json());
@@ -73,13 +79,43 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
             }
         }
 
+        // Log to Supabase (Background)
+        if (supabase) {
+            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            const userAgent = req.headers['user-agent'];
+
+            supabase.from('usage_logs').insert([{
+                birth_date: date,
+                birth_time: time || null,
+                birth_place: place || null,
+                gender: gender,
+                language: language,
+                ip_address: String(ip),
+                user_agent: userAgent,
+                analysis_status: 'success'
+            }]).then(({ error }) => {
+                if (error) console.error('Supabase log error:', error);
+            });
+        }
+
         res.json({
             ...basicInfo,
             aiAnalysis
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
+
+        // Log error to Supabase
+        if (supabase) {
+            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+            supabase.from('usage_logs').insert([{
+                birth_date: req.body.date,
+                ip_address: String(ip),
+                analysis_status: 'error'
+            }]).then(() => { });
+        }
+
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
