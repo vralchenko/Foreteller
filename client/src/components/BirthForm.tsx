@@ -1,11 +1,22 @@
-import { Card, CardContent, Grid, TextField, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import {
+    Card,
+    CardContent,
+    Grid,
+    TextField,
+    Button,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+    Box
+} from '@mui/material';
+import { Male as MaleIcon, Female as FemaleIcon } from '@mui/icons-material';
 import { FormData, Translations } from '../types';
 
 interface BirthFormProps {
     formData: FormData;
     translations: Translations;
     loading: boolean;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: any) => void;
     onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -16,6 +27,12 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     onChange,
     onSubmit,
 }) => {
+    const handleGenderChange = (_: React.MouseEvent<HTMLElement>, newGender: 'male' | 'female') => {
+        if (newGender !== null) {
+            onChange({ target: { name: 'gender', value: newGender } });
+        }
+    };
+
     return (
         <Card sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
             <CardContent>
@@ -56,19 +73,28 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                             />
                         </Grid>
                         <Grid item xs={12} sm={3}>
-                            <FormControl fullWidth>
-                                <InputLabel>{translations.gender}</InputLabel>
-                                <Select
-                                    name="gender"
+                            <Box>
+                                <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block', ml: 1 }}>
+                                    {translations.gender}
+                                </Typography>
+                                <ToggleButtonGroup
                                     value={formData.gender}
-                                    label={translations.gender}
-                                    onChange={(e: any) => onChange(e)}
-                                    required
+                                    exclusive
+                                    onChange={handleGenderChange}
+                                    fullWidth
+                                    size="medium"
+                                    sx={{ height: 56 }}
                                 >
-                                    <MenuItem value="male">{translations.male}</MenuItem>
-                                    <MenuItem value="female">{translations.female}</MenuItem>
-                                </Select>
-                            </FormControl>
+                                    <ToggleButton value="male" sx={{ gap: 1 }}>
+                                        <MaleIcon />
+                                        {translations.male}
+                                    </ToggleButton>
+                                    <ToggleButton value="female" sx={{ gap: 1 }}>
+                                        <FemaleIcon />
+                                        {translations.female}
+                                    </ToggleButton>
+                                </ToggleButtonGroup>
+                            </Box>
                         </Grid>
                         <Grid item xs={12}>
                             <Button
