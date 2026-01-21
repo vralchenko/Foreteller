@@ -167,6 +167,7 @@ function App() {
             <BirthForm
               formData={formData}
               translations={t}
+              language={lang}
               loading={loading}
               onChange={handleChange}
               onSubmit={handleSubmit}
