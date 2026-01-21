@@ -122,8 +122,10 @@ function App() {
   };
 
   const handleListen = () => {
+    // Always clear previous tasks to avoid sticking on mobile
+    window.speechSynthesis.cancel();
+
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
       setIsSpeaking(false);
       return;
     }
@@ -135,11 +137,11 @@ function App() {
     tempDiv.innerHTML = result.aiAnalysis;
     let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
 
-    // Remove emojis, specific astral symbols and pseudographics
-    // This regex covers most emojis, technical symbols, and specific ones like ✨, 🌌, 📐, etc.
+    // Remove emojis, symbols and extras
     textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
-    // Clean up extra spaces
     textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
+
+    if (!textToSpeak) return;
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
@@ -152,15 +154,26 @@ function App() {
       'fr': 'fr-FR',
       'es': 'es-ES'
     };
+
+    // Some mobile browsers need explicit language or it defaults to system
     utterance.lang = langMap[lang] || 'en-US';
-    utterance.rate = 1.0;
+    utterance.rate = 0.9; // Slightly slower for better clarity on mobile
     utterance.pitch = 1.0;
 
+    utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.onerror = (event) => {
+      console.error('Speech error:', event);
+      setIsSpeaking(false);
+    };
 
+    // Mobile-specific "wake up" for speech synthesis
     window.speechSynthesis.speak(utterance);
-    setIsSpeaking(true);
+
+    // Explicitly call resume for Chrome on Android/iOS
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
   };
 
   const handleDownloadPDF = async () => {
