@@ -79,23 +79,29 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
             }
         }
 
-        // Log to Supabase (Background)
+        // Log to Supabase
         if (supabase) {
             const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
             const userAgent = req.headers['user-agent'];
 
-            supabase.from('usage_logs').insert([{
-                birth_date: date,
-                birth_time: time || null,
-                birth_place: place || null,
-                gender: gender,
-                language: language,
-                ip_address: String(ip),
-                user_agent: userAgent,
-                analysis_status: 'success'
-            }]).then(({ error }) => {
-                if (error) console.error('Supabase log error:', error);
-            });
+            try {
+                const { error } = await supabase.from('usage_logs').insert([{
+                    birth_date: date,
+                    birth_time: time || null,
+                    birth_place: place || null,
+                    gender: gender,
+                    language: language,
+                    ip_address: Array.isArray(ip) ? ip[0] : String(ip),
+                    user_agent: userAgent,
+                    analysis_status: 'success'
+                }]);
+
+                if (error) {
+                    console.error('Supabase insert error:', error.message, error.details);
+                }
+            } catch (err) {
+                console.error('Failed to log to Supabase:', err);
+            }
         }
 
         res.json({
@@ -108,12 +114,16 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
 
         // Log error to Supabase
         if (supabase) {
-            const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-            supabase.from('usage_logs').insert([{
-                birth_date: req.body.date,
-                ip_address: String(ip),
-                analysis_status: 'error'
-            }]).then(() => { });
+            try {
+                const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+                await supabase.from('usage_logs').insert([{
+                    birth_date: req.body.date,
+                    ip_address: Array.isArray(ip) ? ip[0] : String(ip),
+                    analysis_status: 'error'
+                }]);
+            } catch (err) {
+                console.error('Failed to log error to Supabase:', err);
+            }
         }
 
         res.status(500).json({ error: 'Internal Server Error' });
