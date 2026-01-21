@@ -37,7 +37,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Astral Analysis',
         error: 'Connection to astral plane failed',
         defaultPlace: 'Kyiv, Ukraine',
-        downloadPdf: 'Download PDF'
+        downloadPdf: 'Download PDF',
+        listenAudio: 'Listen Analysis',
+        stopAudio: 'Stop Listening'
     },
     de: {
         title: 'Foreteller',
@@ -57,7 +59,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Astrale Analyse',
         error: 'Verbindung zur Astralebene fehlgeschlagen',
         defaultPlace: 'Berlin, Deutschland',
-        downloadPdf: 'PDF herunterladen'
+        downloadPdf: 'PDF herunterladen',
+        listenAudio: 'Analyse anhören',
+        stopAudio: 'Zuhören beenden'
     },
     fr: {
         title: 'Foreteller',
@@ -77,7 +81,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Analyse Astrale',
         error: 'Échec de la connexion au plan astral',
         defaultPlace: 'Paris, France',
-        downloadPdf: 'Télécharger PDF'
+        downloadPdf: 'Télécharger PDF',
+        listenAudio: 'Écouter l\'analyse',
+        stopAudio: 'Arrêter l\'écoute'
     },
     es: {
         title: 'Foreteller',
@@ -97,7 +103,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Análisis Astral',
         error: 'Conexión con el plano astral fallida',
         defaultPlace: 'Madrid, España',
-        downloadPdf: 'Descargar PDF'
+        downloadPdf: 'Descargar PDF',
+        listenAudio: 'Escuchar análisis',
+        stopAudio: 'Detener audio'
     },
     uk: {
         title: 'Foreteller',
@@ -117,7 +125,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Астральний Аналіз',
         error: 'Помилка з\'єднання з астралом',
         defaultPlace: 'Київ, Україна',
-        downloadPdf: 'Завантажити PDF'
+        downloadPdf: 'Завантажити PDF',
+        listenAudio: 'Прослухати аналіз',
+        stopAudio: 'Зупинити'
     },
     ru: {
         title: 'Foreteller',
@@ -137,7 +147,9 @@ export const TRANSLATIONS = {
         analysis: '🔮 Астральный Анализ',
         error: 'Ошибка соединения с астралом',
         defaultPlace: 'Киев, Украина',
-        downloadPdf: 'Скачать PDF'
+        downloadPdf: 'Скачать PDF',
+        listenAudio: 'Прослушать анализ',
+        stopAudio: 'Остановить'
     }
 };
 

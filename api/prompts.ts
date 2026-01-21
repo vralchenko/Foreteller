@@ -70,7 +70,7 @@ export function generateAnalysisPrompt(data: PromptData): string {
       moon: 'Tapiz emocional lunar',
       love: 'Amor, relaciones y compatibilidad',
       career: 'Carrera, éxito y crecimiento financiero',
-      health: 'Salud y energía vital',
+      health: 'Salud y энергия vital',
       destiny: 'El destino final'
     };
   } else if (language === 'fr') {
@@ -110,46 +110,48 @@ export function generateAnalysisPrompt(data: PromptData): string {
       IMPORTANT: DO NOT repeat the technical data lists or raw counts (e.g., "1: 5, 2: 3") in the report. Interpret what these numbers mean as professional insights.
 
       YOUR GUIDELINES FOR A COMPREHENSIVE ANALYSIS:
-      1. INTEGRATED APPROACH: Do not analyze systems in isolation. Explain how being a ${zodiac} (Western) and a ${chineseZodiac} (Chinese) creates a unique energetic blend. How does the air/fire/water/earth element of the Zodiac interact with the animal trait?
-      2. DEEP WESTERN ASTROLOGY: Provide a rich description of the ${zodiac} traits, including archetypes, ruling planets, and how they manifest in this specific individual.
-      3. DEEP CHINESE ASTROLOGY: Elaborate on the ${chineseZodiac} animal energy, its social behavior, and hidden potential.
-      4. MASTER NUMEROLOGY: Interpret the Pythagoras Square with clinical precision. Analyze not just single digits, but the STRENGTH OF LINES (e.g., Row 1: Vitality, Row 2: Family, Row 3: Habits) and DIAGONALS (Spirituality vs. Materialism).
-      5. LUNAR MYSTICISM: Connect the ${moon.phase} to the subconscious mind, emotional reactions, and karmic memory.
-      6. PERSONALIZATION: Always tailor the advice to a ${gender}. 
+      1. INTEGRATED APPROACH: Do not analyze systems in isolation. Explain how being a ${zodiac} (Western) and a ${chineseZodiac} (Chinese) creates a unique energetic blend.
+      2. PERSONALIZATION: Always tailor the advice to a ${gender}. 
 
       VOLUME REQUIREMENT: 
-      - The report must be extensive, professional, and visually structured (800-1200 words).
+      - The report must be CONCISE, IMPACTFUL, and visually easy to read (max 500-700 words).
+      - Use SHORT paragraphs (3-4 sentences maximum).
+      - Use BULLET POINTS for key traits, strengths, and advice.
       
       REQUIRED SECTIONS (You MUST use these EXACT titles in <h3> tags):
+      Each section structure:
+      1. One clear analysis paragraph.
+      2. A bulleted list of 3 specific points.
+      3. A <strong>✨ Key Insight:</strong> sentence at the end of each section.
 
       - <h3>🌌 ${headers.intro}</h3>
-        A grand synthesis of the person's cosmic identity. Explain the overarching vibration of their birth date.
+        A punchy synthesis of the cosmic identity.
 
       - <h3>📐 ${headers.numerology}</h3>
-        A deep dive into the Pythagoras Square. Discuss the character, energy, health, intelligence, and luck based on numerical distributions. Explain the meaning of horizontal, vertical, and diagonal lines.
+        Core traits from the Psychomatrix. Focus on the most unique numerical combinations.
 
       - <h3>🐉 ${headers.zodiac}</h3>
-        The intersection of East and West. Detailed analysis of ${zodiac} and ${chineseZodiac}. How these two archetypes conflict or cooperate in one soul.
+        How ${zodiac} and ${chineseZodiac} interact.
 
       - <h3>🌙 ${headers.moon}</h3>
-        The inner mirror. Analysis of the ${moon.phase} and its influence on intuition and the emotional landscape.
+        Subconscious patterns and intuition.
 
       - <h3>❤️ ${headers.love}</h3>
-        Psychological portrait in relationships. What they seek, what they fear, and compatibility keys for this ${gender}.
+        Relationship keys and advice.
 
       - <h3>💼 ${headers.career}</h3>
-        Strategy for success. Professional predispositions, leadership qualities, and financial karma.
+        Professional strategy and success potential.
 
       - <h3>🌿 ${headers.health}</h3>
-        Psycho-somatic insights and energy protection based on the Psychomatrix balance.
+        Energy maintenance tips.
 
       - <h3>🔮 ${headers.destiny}</h3>
-        The Final Revelation. The mission of the soul, the core lesson of this life, and a powerful final blessing.
+        Final soul mission and a short blessing.
 
       FORMATTING:
       - Use ONLY HTML tags (<h3>, <p>, <strong>, <ul>, <li>). 
-      - DO NOT use any Markdown symbols like asterisks (**), underscores (_), or hashes (#).
-      - NEVER include raw JSON data, technical objects, "Working Numbers" strings, or bracketed counts in the response.
+      - DO NOT use any Markdown symbols (** # * _).
+      - NEVER include raw JSON, technical counts, or bracketed numbers.
       - Present all information in flowing, professional text.
       - NO <html>/<body> tags.
       - Language: ${promptLanguage}.

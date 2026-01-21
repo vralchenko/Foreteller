@@ -78,11 +78,15 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
                     // Replace markdown bold with HTML strong
                     aiAnalysis = aiAnalysis.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                     aiAnalysis = aiAnalysis.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                    // Replace markdown headers with HTML headers if they leaked
+                    // Replace markdown headers with HTML headers
                     aiAnalysis = aiAnalysis.replace(/^### (.*$)/gim, '<h3>$1</h3>');
                     aiAnalysis = aiAnalysis.replace(/^## (.*$)/gim, '<h2>$1</h2>');
                     aiAnalysis = aiAnalysis.replace(/^# (.*$)/gim, '<h1>$1</h1>');
-                    // Remove potential leftover JSON or technical artifacts if they appeared despite instructions
+                    // Remove double asterisks that might remain
+                    aiAnalysis = aiAnalysis.replace(/\*\*/g, '');
+                    // Remove list dashes if they leaked outside <ul>
+                    aiAnalysis = aiAnalysis.replace(/^- /gm, '• ');
+                    // Remove potential leftover JSON or technical artifacts
                     aiAnalysis = aiAnalysis.replace(/\{"1":.*?\}/g, '');
                     aiAnalysis = aiAnalysis.replace(/\["1":.*?\]/g, '');
                 }

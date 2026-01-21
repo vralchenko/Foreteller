@@ -15,7 +15,12 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { Calculate as CalculateIcon, PictureAsPdf as PdfIcon } from '@mui/icons-material';
+import {
+  Calculate as CalculateIcon,
+  PictureAsPdf as PdfIcon,
+  PlayArrow as PlayIcon,
+  Stop as StopIcon,
+} from '@mui/icons-material';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -41,6 +46,7 @@ function App() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +60,8 @@ function App() {
     setLoading(true);
     setError('');
     setResult(null);
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
 
     try {
       const response = await fetch('/api/analyze', {
@@ -74,6 +82,42 @@ function App() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleListen = () => {
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
+
+    if (!result?.aiAnalysis) return;
+
+    // Strip HTML tags for speech
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = result.aiAnalysis;
+    const textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    // Set language for speech
+    const langMap: Record<string, string> = {
+      'en': 'en-US',
+      'ru': 'ru-RU',
+      'uk': 'uk-UA',
+      'de': 'de-DE',
+      'fr': 'fr-FR',
+      'es': 'es-ES'
+    };
+    utterance.lang = langMap[lang] || 'en-US';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
   };
 
   const handleDownloadPDF = async () => {
@@ -132,7 +176,13 @@ function App() {
               <ToggleButtonGroup
                 value={lang}
                 exclusive
-                onChange={(_, newLang) => newLang && setLang(newLang)}
+                onChange={(_, newLang) => {
+                  if (newLang) {
+                    setLang(newLang);
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  }
+                }}
                 size={isMobile ? 'small' : 'medium'}
               >
                 <ToggleButton value="en">EN</ToggleButton>
@@ -190,7 +240,15 @@ function App() {
             {/* Results */}
             {result && (
               <Box ref={resultsRef}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, gap: 1 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={isSpeaking ? <StopIcon /> : <PlayIcon />}
+                    onClick={handleListen}
+                    sx={{ borderRadius: 8, borderColor: 'rgba(255,255,255,0.2)', color: 'white' }}
+                  >
+                    {isSpeaking ? t.stopAudio : t.listenAudio}
+                  </Button>
                   <Button
                     variant="contained"
                     startIcon={<PdfIcon />}
@@ -245,9 +303,21 @@ function App() {
 
                   {/* AI Analysis */}
                   <Grid item xs={12}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+                    <Card sx={{
+                      background: 'rgba(30, 27, 75, 0.4)',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+                    }}>
+                      <CardContent sx={{ p: { xs: 2, md: 4 } }}>
+                        <Typography variant="h5" gutterBottom sx={{
+                          fontWeight: 700,
+                          mb: 4,
+                          textAlign: 'center',
+                          textTransform: 'uppercase',
+                          letterSpacing: 2,
+                          color: 'primary.light'
+                        }}>
                           {t.analysis}
                         </Typography>
                         <Box
@@ -255,8 +325,38 @@ function App() {
                             __html: result.aiAnalysis || '<p>AI Analysis unavailable</p>',
                           }}
                           sx={{
-                            '& h3': { color: 'primary.main', mt: 3, mb: 1, fontSize: '1.3rem' },
-                            '& p': { mb: 2, lineHeight: 1.7 },
+                            '& h3': {
+                              color: 'secondary.main',
+                              mt: 5,
+                              mb: 2,
+                              fontSize: '1.5rem',
+                              borderBottom: '1px solid rgba(255,255,255,0.1)',
+                              pb: 1,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 1
+                            },
+                            '& p': {
+                              mb: 3,
+                              lineHeight: 1.8,
+                              fontSize: '1.05rem',
+                              color: 'rgba(255,255,255,0.9)',
+                              textAlign: 'justify'
+                            },
+                            '& ul': {
+                              mb: 4,
+                              pl: 2,
+                              listStyleType: '"✧ "',
+                            },
+                            '& li': {
+                              mb: 1.5,
+                              lineHeight: 1.6,
+                              color: 'rgba(255,255,255,0.85)'
+                            },
+                            '& strong': {
+                              color: 'primary.light',
+                              fontWeight: 600
+                            }
                           }}
                         />
                       </CardContent>
