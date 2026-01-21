@@ -49,6 +49,7 @@ function App() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState('');
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -136,6 +137,9 @@ function App() {
       if (!synth) {
         throw new Error('Speech synthesis not supported in this browser');
       }
+
+      const allVoices = synth.getVoices();
+      setDebugInfo(`Voices: ${allVoices.length}, Lang: ${lang}`);
 
       // Prepare text
       const tempDiv = document.createElement('div');
@@ -338,6 +342,12 @@ function App() {
                     {t.downloadPdf}
                   </Button>
                 </Box>
+
+                {debugInfo && (
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', display: 'block', textAlign: 'center', mb: 2 }}>
+                    Debug: {debugInfo}
+                  </Typography>
+                )}
                 <Grid container spacing={3}>
                   {/* Zodiac */}
                   <Grid item xs={12} sm={6} md={4}>
