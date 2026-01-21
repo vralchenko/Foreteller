@@ -96,7 +96,13 @@ function App() {
     // Strip HTML tags for speech
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = result.aiAnalysis;
-    const textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
+    let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
+
+    // Remove emojis, specific astral symbols and pseudographics
+    // This regex covers most emojis, technical symbols, and specific ones like ✨, 🌌, 📐, etc.
+    textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
+    // Clean up extra spaces
+    textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 

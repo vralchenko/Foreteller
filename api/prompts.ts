@@ -22,7 +22,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
     love: 'Любовь, отношения и совместимость',
     career: 'Карьера, успех и финансовый рост',
     health: 'Здоровье и жизненная энергия',
-    destiny: 'Высшее предназначение'
+    destiny: 'Высшее предназначение',
+    keyInsight: 'Ключевой инсайт'
   };
 
   if (language === 'en') {
@@ -35,7 +36,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
       love: 'Love, Relationships & Compatibility',
       career: 'Career, Success & Financial Growth',
       health: 'Health & Vital Energy',
-      destiny: 'The Ultimate Destiny'
+      destiny: 'The Ultimate Destiny',
+      keyInsight: 'Key Insight'
     };
   } else if (language === 'uk') {
     promptLanguage = 'Ukrainian';
@@ -47,7 +49,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
       love: 'Кохання, стосунки та сумісність',
       career: 'Кар’єра, успіх та фінансове зростання',
       health: 'Здоров’я та життєва енергія',
-      destiny: 'Вище призначення'
+      destiny: 'Вище призначення',
+      keyInsight: 'Ключовий інсайт'
     };
   } else if (language === 'de') {
     promptLanguage = 'German';
@@ -59,7 +62,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
       love: 'Liebe, Beziehungen & Kompatibilität',
       career: 'Karriere, Erfolg & finanzielles Wachstum',
       health: 'Gesundheit & Vitalenergie',
-      destiny: 'Das ultimative Schicksal'
+      destiny: 'Das ultimative Schicksal',
+      keyInsight: 'Haupterkenntnis'
     };
   } else if (language === 'es') {
     promptLanguage = 'Spanish';
@@ -70,8 +74,9 @@ export function generateAnalysisPrompt(data: PromptData): string {
       moon: 'Tapiz emocional lunar',
       love: 'Amor, relaciones y compatibilidad',
       career: 'Carrera, éxito y crecimiento financiero',
-      health: 'Salud y энергия vital',
-      destiny: 'El destino final'
+      health: 'Salud y energía vital',
+      destiny: 'El destino final',
+      keyInsight: 'Idea clave'
     };
   } else if (language === 'fr') {
     promptLanguage = 'French';
@@ -83,7 +88,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
       love: 'Amour, relations et compatibilité',
       career: 'Carrière, succès et croissance financière',
       health: 'Santé et énergie vitale',
-      destiny: 'Le destin ultime'
+      destiny: 'Le destin ultime',
+      keyInsight: 'Aperçu clé'
     };
   }
 
@@ -122,7 +128,7 @@ export function generateAnalysisPrompt(data: PromptData): string {
       Each section structure:
       1. One clear analysis paragraph.
       2. A bulleted list of 3 specific points.
-      3. A <strong>✨ Key Insight:</strong> sentence at the end of each section.
+      3. A <strong>✨ ${headers.keyInsight}:</strong> sentence at the end of each section.
 
       - <h3>🌌 ${headers.intro}</h3>
         A punchy synthesis of the cosmic identity.
@@ -154,7 +160,8 @@ export function generateAnalysisPrompt(data: PromptData): string {
       - NEVER include raw JSON, technical counts, or bracketed numbers.
       - Present all information in flowing, professional text.
       - NO <html>/<body> tags.
-      - Language: ${promptLanguage}.
+      - Language: STRICTLY ${promptLanguage}. Translate everything, including labels and concepts.
+      - DO NOT use English words in a non-English report.
       - Atmosphere: Premium, mystic, insightful, transformative.
     `;
 }
