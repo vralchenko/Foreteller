@@ -123,6 +123,16 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 options={options}
                                 loading={fetchingCities}
                                 value={formData.place}
+                                slotProps={{
+                                    paper: {
+                                        sx: {
+                                            bgcolor: '#1e1b4b', // Solid dark background
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
+                                            mt: 1
+                                        }
+                                    }
+                                }}
                                 onChange={(_, newValue) => {
                                     onChange({ target: { name: 'place', value: newValue || '' } });
                                 }}
