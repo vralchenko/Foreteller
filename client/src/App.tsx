@@ -122,10 +122,10 @@ function App() {
   };
 
   const handleListen = () => {
-    // Always clear previous tasks to avoid sticking on mobile
-    window.speechSynthesis.cancel();
+    const synth = window.speechSynthesis;
 
     if (isSpeaking) {
+      synth.cancel();
       setIsSpeaking(false);
       return;
     }
@@ -155,24 +155,22 @@ function App() {
       'es': 'es-ES'
     };
 
-    // Some mobile browsers need explicit language or it defaults to system
     utterance.lang = langMap[lang] || 'en-US';
-    utterance.rate = 0.9; // Slightly slower for better clarity on mobile
+    utterance.rate = 1.0;
     utterance.pitch = 1.0;
 
-    utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = (event) => {
-      console.error('Speech error:', event);
-      setIsSpeaking(false);
-    };
+    utterance.onerror = () => setIsSpeaking(false);
 
-    // Mobile-specific "wake up" for speech synthesis
-    window.speechSynthesis.speak(utterance);
+    // Immediate feedback for UI
+    setIsSpeaking(true);
 
-    // Explicitly call resume for Chrome on Android/iOS
-    if (window.speechSynthesis.paused) {
-      window.speechSynthesis.resume();
+    // Start synthesis
+    synth.speak(utterance);
+
+    // Some mobile browsers start in a paused state
+    if (synth.paused) {
+      synth.resume();
     }
   };
 
