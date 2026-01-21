@@ -84,11 +84,20 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     };
 
     return (
-        <Card sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
-            <CardContent>
+        <Card sx={{
+            maxWidth: 1000,
+            mx: 'auto',
+            mb: 4,
+            background: 'rgba(255, 255, 255, 0.05)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
+            borderRadius: 4
+        }}>
+            <CardContent sx={{ p: { xs: 2, md: 4 } }}>
                 <form onSubmit={onSubmit}>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={3}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <TextField
                                 fullWidth
                                 label={translations.dob}
@@ -103,7 +112,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={3}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <TextField
                                 fullWidth
                                 label={translations.time}
@@ -114,7 +123,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={3}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <Autocomplete
                                 freeSolo
                                 open={open}
@@ -126,10 +135,11 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 slotProps={{
                                     paper: {
                                         sx: {
-                                            bgcolor: '#1e1b4b', // Solid dark background
+                                            bgcolor: '#1e1b4b',
                                             border: '1px solid rgba(255,255,255,0.1)',
                                             boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
-                                            mt: 1
+                                            mt: 1,
+                                            borderRadius: 2
                                         }
                                     }
                                 }}
@@ -159,7 +169,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 )}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={3}>
+                        <Grid item xs={12} sm={6} md={3}>
                             <ToggleButtonGroup
                                 value={formData.gender}
                                 exclusive
@@ -168,28 +178,29 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 size="small"
                                 sx={{
                                     height: 56,
-                                    bgcolor: 'rgba(255,255,255,0.05)',
+                                    bgcolor: 'rgba(255,255,255,0.03)',
                                     '& .MuiToggleButton-root': {
-                                        color: 'rgba(255,255,255,0.5)',
-                                        border: '1px solid rgba(255,255,255,0.23)',
+                                        color: 'rgba(255,255,255,0.6)',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        transition: 'all 0.3s ease',
                                         '&.Mui-selected': {
                                             color: '#fff',
-                                            bgcolor: 'rgba(168, 85, 247, 0.2)',
-                                            borderColor: '#a855f7',
+                                            bgcolor: 'rgba(168, 85, 247, 0.3)',
+                                            borderColor: 'rgba(168, 85, 247, 0.6)',
                                             '&:hover': {
-                                                bgcolor: 'rgba(168, 85, 247, 0.3)',
+                                                bgcolor: 'rgba(168, 85, 247, 0.4)',
                                             }
                                         }
                                     }
                                 }}
                             >
-                                <ToggleButton value="male" sx={{ flex: 1, gap: 0.5, px: 1, textTransform: 'none' }}>
+                                <ToggleButton value="male" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
                                     <MaleIcon fontSize="small" />
-                                    <Typography variant="body2">{translations.male.charAt(0).toUpperCase()}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.male}</Typography>
                                 </ToggleButton>
-                                <ToggleButton value="female" sx={{ flex: 1, gap: 0.5, px: 1, textTransform: 'none' }}>
+                                <ToggleButton value="female" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
                                     <FemaleIcon fontSize="small" />
-                                    <Typography variant="body2">{translations.female.charAt(0).toUpperCase()}</Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.female}</Typography>
                                 </ToggleButton>
                             </ToggleButtonGroup>
                         </Grid>
@@ -200,9 +211,21 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 type="submit"
                                 disabled={loading}
                                 size="large"
-                                sx={{ py: 1.5 }}
+                                sx={{
+                                    py: 2,
+                                    borderRadius: 3,
+                                    fontSize: '1.1rem',
+                                    fontWeight: 700,
+                                    letterSpacing: 1,
+                                    background: 'linear-gradient(45deg, #a855f7 30%, #6366f1 90%)',
+                                    boxShadow: '0 4px 20px rgba(168, 85, 247, 0.3)',
+                                    '&:hover': {
+                                        background: 'linear-gradient(45deg, #9333ea 30%, #4f46e5 90%)',
+                                        boxShadow: '0 6px 25px rgba(168, 85, 247, 0.4)',
+                                    }
+                                }}
                             >
-                                {loading ? translations.loading : translations.submit}
+                                {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : translations.submit}
                             </Button>
                         </Grid>
                     </Grid>

@@ -13,9 +13,17 @@ export const PythagorasGrid: React.FC<PythagorasGridProps> = ({ square }) => {
     ];
 
     return (
-        <Box sx={{ mt: 2, maxWidth: 280, mx: 'auto' }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1 }}>
-                {matrix.flat().map((num) => {
+        <Box sx={{ mt: 2, maxWidth: 300, mx: 'auto', p: 1 }}>
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 1.5,
+                p: 1.5,
+                background: 'rgba(0, 0, 0, 0.2)',
+                borderRadius: 4,
+                border: '1px solid rgba(255, 255, 255, 0.05)'
+            }}>
+                {matrix.map((row) => row.map((num) => {
                     const count = square[num];
                     const content = count > 0 ? String(num).repeat(count) : '—';
                     return (
@@ -26,18 +34,31 @@ export const PythagorasGrid: React.FC<PythagorasGridProps> = ({ square }) => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                bgcolor: count > 0 ? 'rgba(168, 85, 247, 0.2)' : 'rgba(0,0,0,0.3)',
-                                border: '1px solid rgba(168, 85, 247, 0.3)',
+                                background: count > 0
+                                    ? 'radial-gradient(circle at center, rgba(168, 85, 247, 0.25) 0%, rgba(168, 85, 247, 0.1) 100%)'
+                                    : 'transparent',
+                                border: count > 0
+                                    ? '1px solid rgba(168, 85, 247, 0.4)'
+                                    : '1px solid rgba(255, 255, 255, 0.05)',
                                 borderRadius: 2,
-                                fontSize: '1.2rem',
-                                fontWeight: 'bold',
-                                color: count > 0 ? '#fff' : 'rgba(255,255,255,0.3)',
+                                fontSize: count > 3 ? '0.9rem' : '1.1rem',
+                                fontWeight: 700,
+                                color: count > 0 ? '#e9d5ff' : 'rgba(255,255,255,0.15)',
+                                boxShadow: count > 0 ? '0 0 15px rgba(168, 85, 247, 0.15)' : 'none',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    transform: count > 0 ? 'scale(1.05)' : 'none',
+                                    borderColor: count > 0 ? 'rgba(168, 85, 247, 0.8)' : 'rgba(255,255,255,0.1)',
+                                },
+                                wordBreak: 'break-all',
+                                textAlign: 'center',
+                                p: 0.5
                             }}
                         >
                             {content}
                         </Box>
                     );
-                })}
+                }))}
             </Box>
         </Box>
     );
