@@ -143,8 +143,7 @@ function App() {
       }
 
       // Important: some browsers need voices to be loaded
-      const allVoices = synth.getVoices();
-      setDebugInfo(`Voices: ${allVoices.length}, Lang: ${lang}`);
+      synth.getVoices();
 
       // Prepare text
       const tempDiv = document.createElement('div');
@@ -162,7 +161,7 @@ function App() {
 
       setIsSpeaking(true);
       isSpeakingRef.current = true;
-      utterancesRef.current = []; // Clear previous references
+      utterancesRef.current = [];
 
       let currentIdx = 0;
 
@@ -174,7 +173,7 @@ function App() {
         }
 
         const utterance = new SpeechSynthesisUtterance(sentences[currentIdx].trim());
-        utterancesRef.current.push(utterance); // Prevent GC
+        utterancesRef.current.push(utterance);
 
         const langMap: Record<string, string> = {
           'en': 'en-US', 'ru': 'ru-RU', 'uk': 'uk-UA',
@@ -192,6 +191,9 @@ function App() {
           utterance.voice = voice;
         }
 
+        // Update debug info with selected voice
+        setDebugInfo(`Voices: ${voices.length}, Lang: ${lang}, Voice: ${voice?.name || 'default'}`);
+
         utterance.onend = () => {
           currentIdx++;
           if (isSpeakingRef.current) {
@@ -200,23 +202,24 @@ function App() {
         };
 
         utterance.onerror = (e) => {
-          console.error('Speech error:', e);
-          if (e.error !== 'interrupted') {
+          // 'interrupted' is normal when we stop manually
+          if (e.error !== 'interrupted' && isSpeakingRef.current) {
+            console.error('Speech error:', e);
             setError(`Audio Error: ${e.error}.`);
+            setIsSpeaking(false);
+            isSpeakingRef.current = false;
           }
-          setIsSpeaking(false);
-          isSpeakingRef.current = false;
         };
 
         synth.speak(utterance);
       };
 
       synth.cancel();
-      // Small timeout to ensure cancel is processed
+      // Increase timeout for desktop browsers to 100ms
       setTimeout(() => {
-        if (synth.paused) synth.resume();
+        synth.resume(); // Ensure not stuck in paused state
         speakNext();
-      }, 50);
+      }, 100);
 
     } catch (err: any) {
       setError(`Audio Feature Error: ${err.message}`);
