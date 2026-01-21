@@ -73,6 +73,20 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
 
                 aiAnalysis = response.data.choices[0]?.message?.content || "";
 
+                // Post-processing to ensure clean HTML and no markdown stars
+                if (aiAnalysis) {
+                    // Replace markdown bold with HTML strong
+                    aiAnalysis = aiAnalysis.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    aiAnalysis = aiAnalysis.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    // Replace markdown headers with HTML headers if they leaked
+                    aiAnalysis = aiAnalysis.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                    aiAnalysis = aiAnalysis.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+                    aiAnalysis = aiAnalysis.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+                    // Remove potential leftover JSON or technical artifacts if they appeared despite instructions
+                    aiAnalysis = aiAnalysis.replace(/\{"1":.*?\}/g, '');
+                    aiAnalysis = aiAnalysis.replace(/\["1":.*?\]/g, '');
+                }
+
             } catch (err: any) {
                 console.error("AI API Error:", err.response ? err.response.data : err.message);
                 aiAnalysis = `AI Error: ${err.message}. Please check API credentials.`;
