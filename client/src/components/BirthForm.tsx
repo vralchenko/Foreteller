@@ -126,11 +126,11 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     value={formData.date ? dayjs(formData.date) : null}
                                     onChange={handleDateChange}
                                     maxDate={dayjs()}
+                                    format="DD.MM.YYYY"
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
                                             required: true,
-                                            placeholder: 'DD.MM.YYYY'
                                         }
                                     }}
                                 />
@@ -140,10 +140,10 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     label={translations.time}
                                     value={formData.time ? dayjs(`2000-01-01T${formData.time}`) : null}
                                     onChange={handleTimeChange}
+                                    ampm={false}
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
-                                            placeholder: 'HH:mm'
                                         }
                                     }}
                                 />
