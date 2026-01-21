@@ -8,7 +8,8 @@ import {
     ToggleButtonGroup,
     Typography,
     Autocomplete,
-    CircularProgress
+    CircularProgress,
+    Box
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -29,6 +30,7 @@ interface BirthFormProps {
     translations: Translations;
     language: string;
     loading: boolean;
+    translating?: boolean;
     onChange: (e: any) => void;
     onSubmit: (e: React.FormEvent) => void;
 }
@@ -38,6 +40,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     translations,
     language,
     loading,
+    translating,
     onChange,
     onSubmit,
 }) => {
@@ -250,7 +253,10 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                         }
                                     }}
                                 >
-                                    {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : translations.submit}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                        {(loading || translating) && <CircularProgress size={20} sx={{ color: 'white' }} />}
+                                        {translating ? translations.translating : (loading ? translations.loading : translations.submit)}
+                                    </Box>
                                 </Button>
                             </Grid>
                         </Grid>

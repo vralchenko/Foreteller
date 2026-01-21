@@ -39,7 +39,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Kyiv, Ukraine',
         downloadPdf: 'Download PDF',
         listenAudio: 'Listen Analysis',
-        stopAudio: 'Stop Listening'
+        stopAudio: 'Stop Listening',
+        translating: 'Translating...'
     },
     de: {
         title: 'Foreteller',
@@ -61,7 +62,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Berlin, Deutschland',
         downloadPdf: 'PDF herunterladen',
         listenAudio: 'Analyse anhören',
-        stopAudio: 'Zuhören beenden'
+        stopAudio: 'Zuhören beenden',
+        translating: 'Übersetzen...'
     },
     fr: {
         title: 'Foreteller',
@@ -83,7 +85,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Paris, France',
         downloadPdf: 'Télécharger PDF',
         listenAudio: 'Écouter l\'analyse',
-        stopAudio: 'Arrêter l\'écoute'
+        stopAudio: 'Arrêter l\'écoute',
+        translating: 'Traduction...'
     },
     es: {
         title: 'Foreteller',
@@ -105,7 +108,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Madrid, España',
         downloadPdf: 'Descargar PDF',
         listenAudio: 'Escuchar análisis',
-        stopAudio: 'Detener audio'
+        stopAudio: 'Detener audio',
+        translating: 'Traduciendo...'
     },
     uk: {
         title: 'Foreteller',
@@ -127,7 +131,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Київ, Україна',
         downloadPdf: 'Завантажити PDF',
         listenAudio: 'Прослухати аналіз',
-        stopAudio: 'Зупинити'
+        stopAudio: 'Зупинити',
+        translating: 'Перекладаю...'
     },
     ru: {
         title: 'Foreteller',
@@ -149,7 +154,8 @@ export const TRANSLATIONS = {
         defaultPlace: 'Киев, Украина',
         downloadPdf: 'Скачать PDF',
         listenAudio: 'Прослушать анализ',
-        stopAudio: 'Остановить'
+        stopAudio: 'Остановить',
+        translating: 'Перевожу...'
     }
 };
 

@@ -56,4 +56,7 @@ export interface Translations {
     error: string;
     defaultPlace: string;
     downloadPdf: string;
+    listenAudio: string;
+    stopAudio: string;
+    translating: string;
 }

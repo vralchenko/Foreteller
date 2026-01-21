@@ -46,6 +46,7 @@ function App() {
   const resultsRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [error, setError] = useState('');
 
@@ -58,7 +59,7 @@ function App() {
     const translateAnalysis = async () => {
       // If we have an analysis and the UI language is different from the analysis language
       if (result?.aiAnalysis && result.input?.language !== lang) {
-        setLoading(true);
+        setIsTranslating(true);
         try {
           const response = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/translate`, {
             method: 'POST',
@@ -79,7 +80,7 @@ function App() {
         } catch (err) {
           console.error('Translation failed:', err);
         } finally {
-          setLoading(false);
+          setIsTranslating(false);
         }
       }
     };
@@ -258,9 +259,10 @@ function App() {
             {/* Form */}
             <BirthForm
               formData={formData}
-              translations={t}
+              translations={t as any}
               language={lang}
               loading={loading}
+              translating={isTranslating}
               onChange={handleChange}
               onSubmit={handleSubmit}
             />
