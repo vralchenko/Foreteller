@@ -26,6 +26,13 @@ export interface AnalysisResult {
         emoji: string;
     };
     aiAnalysis?: string;
+    input?: {
+        date: string;
+        time?: string;
+        place?: string;
+        gender: string;
+        language: string;
+    };
 }
 
 export type Language = 'en' | 'de' | 'fr' | 'es' | 'uk' | 'ru';

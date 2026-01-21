@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   ThemeProvider,
   CssBaseline,
@@ -52,6 +52,42 @@ function App() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // Auto-translate analysis when language changes
+  useEffect(() => {
+    const translateAnalysis = async () => {
+      // If we have an analysis and the UI language is different from the analysis language
+      if (result?.aiAnalysis && result.input?.language !== lang) {
+        setLoading(true);
+        try {
+          const response = await fetch(`${(import.meta as any).env.VITE_API_URL || 'http://localhost:3001'}/api/translate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: result.aiAnalysis, targetLang: lang }),
+          });
+          const data = await response.json();
+          if (response.ok && data.translatedText) {
+            setResult({
+              ...result,
+              aiAnalysis: data.translatedText,
+              input: result.input ? {
+                ...result.input,
+                language: lang
+              } : undefined
+            });
+          }
+        } catch (err) {
+          console.error('Translation failed:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    if (result) {
+      translateAnalysis();
+    }
+  }, [lang, result?.aiAnalysis]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
