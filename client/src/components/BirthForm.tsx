@@ -132,8 +132,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     format="DD.MM.YYYY"
                                     slotProps={{
                                         textField: {
-                                            fullWidth: true,
-                                            required: true,
+                                            fullWidth: true
                                         }
                                     }}
                                 />

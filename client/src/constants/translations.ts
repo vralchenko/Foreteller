@@ -22,8 +22,8 @@ export const TRANSLATIONS = {
     en: {
         title: 'Foreteller',
         subtitle: 'WISDOM OF STARS AND NUMBERS',
-        dob: 'Date of Birth',
-        time: 'Time (optional)',
+        dob: 'date of birth',
+        time: 'time (optional)',
         place: 'Place of Birth',
         gender: 'Gender',
         male: 'Male',
@@ -36,17 +36,18 @@ export const TRANSLATIONS = {
         moon: 'Moon Phase',
         analysis: '🔮 Astral Analysis',
         error: 'Connection to astral plane failed',
-        defaultPlace: 'Kyiv, Ukraine',
+        defaultPlace: 'Enter place of birth',
         downloadPdf: 'Download PDF',
         listenAudio: 'Listen Analysis',
         stopAudio: 'Stop Listening',
-        translating: 'Translating...'
+        translating: 'Translating...',
+        fillAll: 'Please fill in all fields'
     },
     de: {
         title: 'Foreteller',
         subtitle: 'WEISHEIT DER STERNE UND ZAHLEN',
-        dob: 'Geburtsdatum',
-        time: 'Zeit (optional)',
+        dob: 'geburtsdatum',
+        time: 'zeit (optional)',
         place: 'Geburtsort',
         gender: 'Geschlecht',
         male: 'Männlich',
@@ -59,17 +60,18 @@ export const TRANSLATIONS = {
         moon: 'Mondphase',
         analysis: '🔮 Astrale Analyse',
         error: 'Verbindung zur Astralebene fehlgeschlagen',
-        defaultPlace: 'Berlin, Deutschland',
+        defaultPlace: 'Geburtsort eingeben',
         downloadPdf: 'PDF herunterladen',
         listenAudio: 'Analyse anhören',
         stopAudio: 'Zuhören beenden',
-        translating: 'Übersetzen...'
+        translating: 'Übersetzen...',
+        fillAll: 'Bitte füllen Sie alle Felder aus'
     },
     fr: {
         title: 'Foreteller',
         subtitle: 'SAGESSE DES ÉTOILES ET DES NOMBRES',
-        dob: 'Date de naissance',
-        time: 'Heure (facultatif)',
+        dob: 'date de naissance',
+        time: 'heure (facultatif)',
         place: 'Lieu de naissance',
         gender: 'Sexe',
         male: 'Homme',
@@ -82,17 +84,18 @@ export const TRANSLATIONS = {
         moon: 'Phase de Lune',
         analysis: '🔮 Analyse Astrale',
         error: 'Échec de la connexion au plan astral',
-        defaultPlace: 'Paris, France',
+        defaultPlace: 'Entrez le lieu de naissance',
         downloadPdf: 'Télécharger PDF',
         listenAudio: 'Écouter l\'analyse',
         stopAudio: 'Arrêter l\'écoute',
-        translating: 'Traduction...'
+        translating: 'Traduction...',
+        fillAll: 'Veuillez remplir tous les champs'
     },
     es: {
         title: 'Foreteller',
         subtitle: 'SABIDURÍA DE LAS ESTRELLAS Y LOS NÚMEROS',
-        dob: 'Fecha de nacimiento',
-        time: 'Hora (opcional)',
+        dob: 'fecha de nacimiento',
+        time: 'hora (opcional)',
         place: 'Lugar de nacimiento',
         gender: 'Sexo',
         male: 'Masculino',
@@ -105,17 +108,18 @@ export const TRANSLATIONS = {
         moon: 'Fase Lunar',
         analysis: '🔮 Análisis Astral',
         error: 'Conexión con el plano astral fallida',
-        defaultPlace: 'Madrid, España',
+        defaultPlace: 'Ingrese lugar de nacimiento',
         downloadPdf: 'Descargar PDF',
         listenAudio: 'Escuchar análisis',
         stopAudio: 'Detener audio',
-        translating: 'Traduciendo...'
+        translating: 'Traduciendo...',
+        fillAll: 'Por favor complete todos los campos'
     },
     uk: {
         title: 'Foreteller',
         subtitle: 'МУДРІСТЬ ЗІРОК І ЧИСЕЛ',
-        dob: 'Дата народження',
-        time: 'Час (необов\'язково)',
+        dob: 'дата народження',
+        time: 'час (необов\'язково)',
         place: 'Місце народження',
         gender: 'Стать',
         male: 'Чоловік',
@@ -128,17 +132,18 @@ export const TRANSLATIONS = {
         moon: 'Фаза Місяця',
         analysis: '🔮 Астральний Аналіз',
         error: 'Помилка з\'єднання з астралом',
-        defaultPlace: 'Київ, Україна',
+        defaultPlace: 'Введіть місце народження',
         downloadPdf: 'Завантажити PDF',
         listenAudio: 'Прослухати аналіз',
         stopAudio: 'Зупинити',
-        translating: 'Перекладаю...'
+        translating: 'Перекладаю...',
+        fillAll: 'Будь ласка, заповніть усі поля'
     },
     ru: {
         title: 'Foreteller',
         subtitle: 'МУДРОСТЬ ЗВЕЗД И ЧИСЕЛ',
-        dob: 'Дата рождения',
-        time: 'Время (необязательно)',
+        dob: 'дата рождения',
+        time: 'время (необязательно)',
         place: 'Место рождения',
         gender: 'Пол',
         male: 'Мужской',
@@ -151,11 +156,12 @@ export const TRANSLATIONS = {
         moon: 'Фаза Луны',
         analysis: '🔮 Астральный Анализ',
         error: 'Ошибка соединения с астралом',
-        defaultPlace: 'Киев, Украина',
+        defaultPlace: 'Введите место рождения',
         downloadPdf: 'Скачать PDF',
         listenAudio: 'Прослушать анализ',
         stopAudio: 'Остановить',
-        translating: 'Перевожу...'
+        translating: 'Перевожу...',
+        fillAll: 'Пожалуйста, заполните все поля'
     }
 };
 

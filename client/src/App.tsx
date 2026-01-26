@@ -94,7 +94,10 @@ function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.date) return;
+    if (!formData.date) {
+      setError(t.fillAll);
+      return;
+    }
 
     setLoading(true);
     setError('');
