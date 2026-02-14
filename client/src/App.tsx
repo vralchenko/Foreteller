@@ -313,19 +313,37 @@ function App() {
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfPageHeight = pdf.internal.pageSize.getHeight();
-      const imgHeightMM = (canvas.height * pdfWidth) / canvas.width;
 
+      // --- HEADER WITH BIRTH DATA ---
+      const headerHeight = 35;
+      pdf.setFillColor(30, 27, 75); // Same as canvas background
+      pdf.rect(0, 0, pdfWidth, headerHeight, 'F');
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(14);
+
+      const genderLabel = formData.gender === 'male' ? t.male : t.female;
+      const birthInfo = `${(t.dob as string).toUpperCase()}: ${formData.date}  |  ${(t.time as string).toUpperCase()}: ${formData.time || '--:--'}  |  ${(t.gender as string).toUpperCase()}: ${genderLabel}`;
+      const birthPlace = `${(t.place as string).toUpperCase()}: ${formData.place}`;
+
+      pdf.text(birthInfo, 15, 15);
+      pdf.text(birthPlace, 15, 25);
+      pdf.setDrawColor(255, 255, 255, 0.2);
+      pdf.line(15, 28, pdfWidth - 15, 28);
+
+      const imgHeightMM = (canvas.height * pdfWidth) / canvas.width;
       let heightLeft = imgHeightMM;
-      let position = 0;
+      let position = headerHeight; // Start image below header
 
       // Add first page
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
-      heightLeft -= pdfPageHeight;
+      heightLeft -= (pdfPageHeight - headerHeight);
 
       // Add subsequent pages if necessary
       while (heightLeft > 0) {
-        position = heightLeft - imgHeightMM;
         pdf.addPage();
+        position = heightLeft - imgHeightMM;
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
         heightLeft -= pdfPageHeight;
       }
