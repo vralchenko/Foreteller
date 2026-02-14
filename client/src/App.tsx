@@ -53,6 +53,7 @@ function App() {
   const [error, setError] = useState('');
 
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
+  const [apiMessage, setApiMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -74,6 +75,7 @@ function App() {
 
         if (action === 'HIGHLIGHT_FIELD') {
           setHighlightedField(payload.name);
+          setApiMessage(payload.message || null);
           if (payload.name) {
             // Auto-scroll to field if it's not in view
             const el = document.getElementsByName(payload.name)[0];
@@ -95,11 +97,12 @@ function App() {
             formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           }
           setHighlightedField(null);
+          setApiMessage(null);
         }
 
         if (action === 'SCROLL') {
           const { direction } = payload;
-          const scrollAmount = direction === 'down' ? 800 : -800;
+          const scrollAmount = direction === 'down' ? 1000 : -1000;
           window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
         }
 
@@ -387,6 +390,7 @@ function App() {
               loading={loading}
               translating={isTranslating}
               highlightedField={highlightedField}
+              apiMessage={apiMessage}
               onChange={handleChange}
               onSubmit={handleSubmit}
             />

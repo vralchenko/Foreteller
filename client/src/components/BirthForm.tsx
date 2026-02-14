@@ -23,6 +23,7 @@ import 'dayjs/locale/es';
 import dayjs, { Dayjs } from 'dayjs';
 import { Male as MaleIcon, Female as FemaleIcon } from '@mui/icons-material';
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FormData, Translations } from '../types';
 
 interface BirthFormProps {
@@ -32,6 +33,7 @@ interface BirthFormProps {
     loading: boolean;
     translating?: boolean;
     highlightedField?: string | null;
+    apiMessage?: string | null;
     onChange: (e: any) => void;
     onSubmit: (e: React.FormEvent) => void;
 }
@@ -43,17 +45,62 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     loading,
     translating,
     highlightedField,
+    apiMessage,
     onChange,
     onSubmit,
 }) => {
     const isHighlighted = (name: string) => highlightedField === name;
-    const highlightStyles = {
-        outline: '3px solid #fbbf24',
-        outlineOffset: '2px',
-        boxShadow: '0 0 40px rgba(251, 191, 36, 0.4)',
-        borderRadius: '8px',
-        transition: 'all 0.4s ease-in-out',
-        zIndex: 50
+
+    const FieldWrapper: React.FC<{ name: string; children: React.ReactNode }> = ({ name, children }) => {
+        const highlighted = isHighlighted(name);
+        return (
+            <Box sx={{ position: 'relative' }}>
+                <AnimatePresence>
+                    {highlighted && apiMessage && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            style={{
+                                position: 'absolute',
+                                top: '-45px',
+                                left: '0',
+                                zIndex: 100,
+                                background: '#fbbf24',
+                                color: '#000',
+                                padding: '6px 12px',
+                                borderRadius: '8px',
+                                fontWeight: 'bold',
+                                fontSize: '0.85rem',
+                                whiteSpace: 'nowrap',
+                                boxShadow: '0 10px 15px rgba(0,0,0,0.3)',
+                                pointerEvents: 'none'
+                            }}
+                        >
+                            {apiMessage}
+                            <div style={{
+                                position: 'absolute',
+                                bottom: '-6px',
+                                left: '20px',
+                                width: '12px',
+                                height: '12px',
+                                background: '#fbbf24',
+                                transform: 'rotate(45deg)'
+                            }} />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                <div style={{
+                    outline: highlighted ? '3px solid #fbbf24' : 'none',
+                    outlineOffset: '2px',
+                    boxShadow: highlighted ? '0 0 30px rgba(251, 191, 36, 0.4)' : 'none',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease'
+                }}>
+                    {children}
+                </div>
+            </Box>
+        );
     };
 
     const [open, setOpen] = useState(false);
@@ -135,144 +182,154 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                 <CardContent sx={{ p: { xs: 2, md: 4 } }}>
                     <form onSubmit={onSubmit}>
                         <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('date') ? highlightStyles : {}}>
-                                <DatePicker
-                                    label={translations.dob}
-                                    value={formData.date ? dayjs(formData.date) : null}
-                                    onChange={handleDateChange}
-                                    maxDate={dayjs()}
-                                    format="DD.MM.YYYY"
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                            name: 'date'
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('time') ? highlightStyles : {}}>
-                                <TimePicker
-                                    label={translations.time}
-                                    value={formData.time ? dayjs(`2000-01-01T${formData.time}`) : null}
-                                    onChange={handleTimeChange}
-                                    ampm={false}
-                                    slotProps={{
-                                        textField: {
-                                            fullWidth: true,
-                                            name: 'time'
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('place') ? highlightStyles : {}}>
-                                <Autocomplete
-                                    freeSolo
-                                    open={open}
-                                    onOpen={() => setOpen(true)}
-                                    onClose={() => setOpen(false)}
-                                    options={options}
-                                    loading={fetchingCities}
-                                    value={formData.place}
-                                    slotProps={{
-                                        paper: {
-                                            sx: {
-                                                bgcolor: '#1e1b4b',
-                                                border: '1px solid rgba(255,255,255,0.1)',
-                                                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
-                                                mt: 1,
-                                                borderRadius: 2
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FieldWrapper name="date">
+                                    <DatePicker
+                                        label={translations.dob}
+                                        value={formData.date ? dayjs(formData.date) : null}
+                                        onChange={handleDateChange}
+                                        maxDate={dayjs()}
+                                        format="DD.MM.YYYY"
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                name: 'date'
                                             }
-                                        }
-                                    }}
-                                    onChange={(_, newValue) => {
-                                        onChange({ target: { name: 'place', value: newValue || '' } });
-                                    }}
-                                    onInputChange={(_, newInputValue) => {
-                                        setInputValue(newInputValue);
-                                        onChange({ target: { name: 'place', value: newInputValue } });
-                                    }}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            name="place"
-                                            label={translations.place}
-                                            placeholder={translations.defaultPlace}
-                                            InputLabelProps={{ shrink: true }}
-                                            InputProps={{
-                                                ...params.InputProps,
-                                                endAdornment: (
-                                                    <>
-                                                        {fetchingCities ? <CircularProgress color="inherit" size={20} /> : null}
-                                                        {params.InputProps.endAdornment}
-                                                    </>
-                                                ),
-                                            }}
-                                        />
-                                    )}
-                                />
+                                        }}
+                                    />
+                                </FieldWrapper>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('gender') ? highlightStyles : {}}>
-                                <ToggleButtonGroup
-                                    value={formData.gender}
-                                    exclusive
-                                    onChange={handleGenderChange}
-                                    fullWidth
-                                    size="small"
-                                    sx={{
-                                        height: 56,
-                                        bgcolor: 'rgba(255,255,255,0.03)',
-                                        '& .MuiToggleButton-root': {
-                                            color: 'rgba(255,255,255,0.6)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            transition: 'all 0.3s ease',
-                                            '&.Mui-selected': {
-                                                color: '#fff',
-                                                bgcolor: 'rgba(168, 85, 247, 0.3)',
-                                                borderColor: 'rgba(168, 85, 247, 0.6)',
-                                                '&:hover': {
-                                                    bgcolor: 'rgba(168, 85, 247, 0.4)',
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FieldWrapper name="time">
+                                    <TimePicker
+                                        label={translations.time}
+                                        value={formData.time ? dayjs(`2000-01-01T${formData.time}`) : null}
+                                        onChange={handleTimeChange}
+                                        ampm={false}
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                name: 'time'
+                                            }
+                                        }}
+                                    />
+                                </FieldWrapper>
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FieldWrapper name="place">
+                                    <Autocomplete
+                                        freeSolo
+                                        open={open}
+                                        onOpen={() => setOpen(true)}
+                                        onClose={() => setOpen(false)}
+                                        options={options}
+                                        loading={fetchingCities}
+                                        value={formData.place}
+                                        slotProps={{
+                                            paper: {
+                                                sx: {
+                                                    bgcolor: '#1e1b4b',
+                                                    border: '1px solid rgba(255,255,255,0.1)',
+                                                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.4)',
+                                                    mt: 1,
+                                                    borderRadius: 2
                                                 }
                                             }
-                                        }
-                                    }}
-                                >
-                                    <ToggleButton value="male" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
-                                        <MaleIcon fontSize="small" />
-                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.male}</Typography>
-                                    </ToggleButton>
-                                    <ToggleButton value="female" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
-                                        <FemaleIcon fontSize="small" />
-                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.female}</Typography>
-                                    </ToggleButton>
-                                </ToggleButtonGroup>
+                                        }}
+                                        onChange={(_, newValue) => {
+                                            onChange({ target: { name: 'place', value: newValue || '' } });
+                                        }}
+                                        onInputChange={(_, newInputValue) => {
+                                            setInputValue(newInputValue);
+                                            onChange({ target: { name: 'place', value: newInputValue } });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                name="place"
+                                                label={translations.place}
+                                                placeholder={translations.defaultPlace}
+                                                InputLabelProps={{ shrink: true }}
+                                                InputProps={{
+                                                    ...params.InputProps,
+                                                    endAdornment: (
+                                                        <>
+                                                            {fetchingCities ? <CircularProgress color="inherit" size={20} /> : null}
+                                                            {params.InputProps.endAdornment}
+                                                        </>
+                                                    ),
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </FieldWrapper>
                             </Grid>
-                            <Grid item xs={12} sx={isHighlighted('submit') ? highlightStyles : {}}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    type="submit"
-                                    name="submit"
-                                    disabled={loading}
-                                    size="large"
-                                    sx={{
-                                        py: 2,
-                                        borderRadius: 3,
-                                        fontSize: '1.1rem',
-                                        fontWeight: 700,
-                                        letterSpacing: 1,
-                                        background: 'linear-gradient(45deg, #a855f7 30%, #6366f1 90%)',
-                                        boxShadow: '0 4px 20px rgba(168, 85, 247, 0.3)',
-                                        '&:hover': {
-                                            background: 'linear-gradient(45deg, #9333ea 30%, #4f46e5 90%)',
-                                            boxShadow: '0 6px 25px rgba(168, 85, 247, 0.4)',
-                                        }
-                                    }}
-                                >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        {(loading || translating) && <CircularProgress size={20} sx={{ color: 'white' }} />}
-                                        {translating ? translations.translating : (loading ? translations.loading : translations.submit)}
-                                    </Box>
-                                </Button>
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FieldWrapper name="gender">
+                                    <ToggleButtonGroup
+                                        value={formData.gender}
+                                        exclusive
+                                        onChange={handleGenderChange}
+                                        fullWidth
+                                        size="small"
+                                        sx={{
+                                            height: 56,
+                                            bgcolor: 'rgba(255,255,255,0.03)',
+                                            '& .MuiToggleButton-root': {
+                                                color: 'rgba(255,255,255,0.6)',
+                                                border: '1px solid rgba(255,255,255,0.1)',
+                                                transition: 'all 0.3s ease',
+                                                '&.Mui-selected': {
+                                                    color: '#fff',
+                                                    bgcolor: 'rgba(168, 85, 247, 0.3)',
+                                                    borderColor: 'rgba(168, 85, 247, 0.6)',
+                                                    '&:hover': {
+                                                        bgcolor: 'rgba(168, 85, 247, 0.4)',
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <ToggleButton value="male" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
+                                            <MaleIcon fontSize="small" />
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.male}</Typography>
+                                        </ToggleButton>
+                                        <ToggleButton value="female" sx={{ flex: 1, gap: 1, textTransform: 'none' }}>
+                                            <FemaleIcon fontSize="small" />
+                                            <Typography variant="body2" sx={{ fontWeight: 600 }}>{translations.female}</Typography>
+                                        </ToggleButton>
+                                    </ToggleButtonGroup>
+                                </FieldWrapper>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FieldWrapper name="submit">
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        type="submit"
+                                        name="submit"
+                                        disabled={loading}
+                                        size="large"
+                                        sx={{
+                                            py: 2,
+                                            borderRadius: 3,
+                                            fontSize: '1.1rem',
+                                            fontWeight: 700,
+                                            letterSpacing: 1,
+                                            background: 'linear-gradient(45deg, #a855f7 30%, #6366f1 90%)',
+                                            boxShadow: '0 4px 20px rgba(168, 85, 247, 0.3)',
+                                            '&:hover': {
+                                                background: 'linear-gradient(45deg, #9333ea 30%, #4f46e5 90%)',
+                                                boxShadow: '0 6px 25px rgba(168, 85, 247, 0.4)',
+                                            }
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            {(loading || translating) && <CircularProgress size={20} sx={{ color: 'white' }} />}
+                                            {translating ? translations.translating : (loading ? translations.loading : translations.submit)}
+                                        </Box>
+                                    </Button>
+                                </FieldWrapper>
                             </Grid>
                         </Grid>
                     </form>
