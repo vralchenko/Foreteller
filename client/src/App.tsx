@@ -271,8 +271,11 @@ function App() {
         utterance.onerror = (e) => {
           // 'interrupted' is normal when we stop manually
           if (e.error !== 'interrupted' && isSpeakingRef.current) {
-            console.error('Speech error:', e);
-            setError(`Audio Error: ${e.error}.`);
+            console.warn('Speech synthesis error:', e.error);
+            // Don't show the error to user if it's an autoplay/not-allowed issue
+            if (e.error !== 'not-allowed') {
+              setError(`Audio Error: ${e.error}.`);
+            }
             setIsSpeaking(false);
             isSpeakingRef.current = false;
           }
