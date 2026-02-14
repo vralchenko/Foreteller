@@ -52,6 +52,8 @@ function App() {
   const utterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const [error, setError] = useState('');
 
+  const [highlightedField, setHighlightedField] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -70,11 +72,29 @@ function App() {
           setFormData(prev => ({ ...prev, [name]: value }));
         }
 
+        if (action === 'HIGHLIGHT_FIELD') {
+          setHighlightedField(payload.name);
+          if (payload.name) {
+            // Auto-scroll to field if it's not in view
+            const el = document.getElementsByName(payload.name)[0];
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+
+        if (action === 'SET_LANGUAGE') {
+          setLang(payload.lang);
+        }
+
+        if (action === 'TOGGLE_AUDIO') {
+          handleListen();
+        }
+
         if (action === 'SUBMIT') {
           const formElement = document.querySelector('form');
           if (formElement) {
             formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           }
+          setHighlightedField(null);
         }
 
         if (action === 'SCROLL') {
@@ -92,7 +112,7 @@ function App() {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [lang, result]); // Added dependencies for stable access to stateful functions
 
   // Auto-translate analysis when language changes
   useEffect(() => {
@@ -366,6 +386,7 @@ function App() {
               language={lang}
               loading={loading}
               translating={isTranslating}
+              highlightedField={highlightedField}
               onChange={handleChange}
               onSubmit={handleSubmit}
             />

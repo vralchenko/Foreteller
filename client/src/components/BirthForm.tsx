@@ -31,6 +31,7 @@ interface BirthFormProps {
     language: string;
     loading: boolean;
     translating?: boolean;
+    highlightedField?: string | null;
     onChange: (e: any) => void;
     onSubmit: (e: React.FormEvent) => void;
 }
@@ -41,9 +42,20 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     language,
     loading,
     translating,
+    highlightedField,
     onChange,
     onSubmit,
 }) => {
+    const isHighlighted = (name: string) => highlightedField === name;
+    const highlightStyles = {
+        outline: '3px solid #fbbf24',
+        outlineOffset: '2px',
+        boxShadow: '0 0 40px rgba(251, 191, 36, 0.4)',
+        borderRadius: '8px',
+        transition: 'all 0.4s ease-in-out',
+        zIndex: 50
+    };
+
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -123,7 +135,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                 <CardContent sx={{ p: { xs: 2, md: 4 } }}>
                     <form onSubmit={onSubmit}>
                         <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('date') ? highlightStyles : {}}>
                                 <DatePicker
                                     label={translations.dob}
                                     value={formData.date ? dayjs(formData.date) : null}
@@ -132,12 +144,13 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     format="DD.MM.YYYY"
                                     slotProps={{
                                         textField: {
-                                            fullWidth: true
+                                            fullWidth: true,
+                                            name: 'date'
                                         }
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('time') ? highlightStyles : {}}>
                                 <TimePicker
                                     label={translations.time}
                                     value={formData.time ? dayjs(`2000-01-01T${formData.time}`) : null}
@@ -146,11 +159,12 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     slotProps={{
                                         textField: {
                                             fullWidth: true,
+                                            name: 'time'
                                         }
                                     }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('place') ? highlightStyles : {}}>
                                 <Autocomplete
                                     freeSolo
                                     open={open}
@@ -180,6 +194,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
+                                            name="place"
                                             label={translations.place}
                                             placeholder={translations.defaultPlace}
                                             InputLabelProps={{ shrink: true }}
@@ -196,7 +211,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6} md={3}>
+                            <Grid item xs={12} sm={6} md={3} sx={isHighlighted('gender') ? highlightStyles : {}}>
                                 <ToggleButtonGroup
                                     value={formData.gender}
                                     exclusive
@@ -231,11 +246,12 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                     </ToggleButton>
                                 </ToggleButtonGroup>
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={12} sx={isHighlighted('submit') ? highlightStyles : {}}>
                                 <Button
                                     fullWidth
                                     variant="contained"
                                     type="submit"
+                                    name="submit"
                                     disabled={loading}
                                     size="large"
                                     sx={{
