@@ -102,11 +102,12 @@ function App() {
         }
 
         if (action === 'SCROLL') {
-          const { direction } = payload;
+          const { direction, value } = payload;
           setHighlightedField(null);
           setApiMessage(null);
           if (direction === 'down') {
-            window.scrollTo({ top: 800, behavior: 'smooth' });
+            const scrollPos = value || 850;
+            window.scrollTo({ top: scrollPos, behavior: 'smooth' });
           } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
