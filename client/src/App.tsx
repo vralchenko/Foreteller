@@ -56,6 +56,35 @@ function App() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // --- Presentation API (Playwright-like control) ---
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // For security, you might want to check event.origin here
+      const { type, action, payload } = event.data;
+
+      if (type === 'PRESENTATION_COMMAND') {
+        console.log('Foreteller received command:', action, payload);
+
+        if (action === 'FILL_FIELD') {
+          const { name, value } = payload;
+          setFormData(prev => ({ ...prev, [name]: value }));
+        }
+
+        if (action === 'SUBMIT') {
+          // Trigger the submit logic
+          // Since handleSubmit needs a form event, we can call the logic directly or dispatch a 'submit' event to the form
+          const formElement = document.querySelector('form');
+          if (formElement) {
+            formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   // Auto-translate analysis when language changes
   useEffect(() => {
     const translateAnalysis = async () => {
