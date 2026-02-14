@@ -92,6 +92,7 @@ function App() {
         }
 
         if (action === 'SUBMIT') {
+          setResult(null); // Clear old results to prevent flashes
           const formElement = document.querySelector('form');
           if (formElement) {
             formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -102,8 +103,13 @@ function App() {
 
         if (action === 'SCROLL') {
           const { direction } = payload;
-          const scrollAmount = direction === 'down' ? 1000 : -1000;
-          window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+          setHighlightedField(null);
+          setApiMessage(null);
+          if (direction === 'down') {
+            window.scrollTo({ top: 800, behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
         }
 
         if (action === 'DOWNLOAD_PDF') {

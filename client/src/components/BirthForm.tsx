@@ -58,44 +58,49 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                 <AnimatePresence>
                     {highlighted && apiMessage && (
                         <motion.div
-                            initial={{ opacity: 0, y: 10, scale: 0.8 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
                             style={{
                                 position: 'absolute',
-                                top: '-45px',
-                                left: '0',
-                                zIndex: 100,
+                                top: '-65px',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                zIndex: 200,
                                 background: '#fbbf24',
                                 color: '#000',
-                                padding: '6px 12px',
-                                borderRadius: '8px',
+                                padding: '8px 16px',
+                                borderRadius: '10px',
                                 fontWeight: 'bold',
-                                fontSize: '0.85rem',
+                                fontSize: '0.9rem',
                                 whiteSpace: 'nowrap',
-                                boxShadow: '0 10px 15px rgba(0,0,0,0.3)',
+                                boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
                                 pointerEvents: 'none'
                             }}
                         >
                             {apiMessage}
                             <div style={{
                                 position: 'absolute',
-                                bottom: '-6px',
-                                left: '20px',
-                                width: '12px',
-                                height: '12px',
+                                bottom: '-8px',
+                                left: '50%',
+                                marginLeft: '-8px',
+                                width: '16px',
+                                height: '16px',
                                 background: '#fbbf24',
-                                transform: 'rotate(45deg)'
+                                transform: 'rotate(45deg)',
+                                boxShadow: '5px 5px 10px rgba(0,0,0,0.1)'
                             }} />
                         </motion.div>
                     )}
                 </AnimatePresence>
                 <div style={{
+                    position: 'relative',
+                    zIndex: highlighted ? 150 : 1,
                     outline: highlighted ? '3px solid #fbbf24' : 'none',
                     outlineOffset: '2px',
-                    boxShadow: highlighted ? '0 0 30px rgba(251, 191, 36, 0.4)' : 'none',
+                    boxShadow: highlighted ? '0 0 40px rgba(251, 191, 36, 0.5)' : 'none',
                     borderRadius: '8px',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                 }}>
                     {children}
                 </div>
