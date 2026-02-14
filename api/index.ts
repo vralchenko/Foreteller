@@ -19,6 +19,14 @@ const supabase = (supabaseUrl && supabaseServiceKey) ? createClient(supabaseUrl,
 app.use(cors());
 app.use(express.json());
 
+// Allow iframe embedding from any origin
+app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', 'frame-ancestors *');
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
+    next();
+});
+
+
 interface AnalyzeRequest {
     date: string;
     time?: string;
