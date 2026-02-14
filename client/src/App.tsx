@@ -71,12 +71,21 @@ function App() {
         }
 
         if (action === 'SUBMIT') {
-          // Trigger the submit logic
-          // Since handleSubmit needs a form event, we can call the logic directly or dispatch a 'submit' event to the form
           const formElement = document.querySelector('form');
           if (formElement) {
             formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
           }
+        }
+
+        if (action === 'SCROLL') {
+          const { direction } = payload;
+          const scrollAmount = direction === 'down' ? 800 : -800;
+          window.scrollBy({ top: scrollAmount, behavior: 'smooth' });
+        }
+
+        if (action === 'DOWNLOAD_PDF') {
+          // Trigger the existing PDF download function
+          handleDownloadPDF();
         }
       }
     };
