@@ -193,19 +193,25 @@ export function generateCompatibilityPrompt(p1: PromptData, p2: PromptData): str
 
   return `
       ACT AS A MASTER ASTROLOGER AND NUMEROLOGIST.
-      Analyze the compatibility between two partners:
+      Analyze the compatibility between two partners.
+      
       Partner 1: ${p1.gender}, ${p1.zodiac} (${p1.chineseZodiac}), Pythagoras Square: ${JSON.stringify(p1.pythagoras.square)}
       Partner 2: ${p2.gender}, ${p2.zodiac} (${p2.chineseZodiac}), Pythagoras Square: ${JSON.stringify(p2.pythagoras.square)}
       
       Volume: 400-600 words.
-      Format: HTML (<h3>, <p>, <ul>, <li>, <strong>).
+      Format: HTML (<h3>, <p>, <ul>, <li>, <strong>, <table>).
       Language: ${promptLanguage}.
+      
+      CRITICAL INSTRUCTIONS:
+      1. DO NOT show raw JSON data like {"1": 5...} in the output.
+      2. In the "${headers.numerology}" section, draw the 3x3 Pythagoras squares for BOTH partners using <table> with thin borders.
+      3. Compare their psychomatrices visually and conceptually.
       
       Structure:
       - <h3>💞 ${headers.intro}</h3>
         General feeling of the union.
       - <h3>📐 ${headers.numerology}</h3>
-        How their psychomatrices interact.
+        Draw squares for P1 and P2 side-by-side (if possible using CSS/tables) and analyze how their psychomatrices interact.
       - <h3>✨ ${headers.zodiac}</h3>
         Astrological connection.
       - <h3>🔮 ${headers.advice}</h3>

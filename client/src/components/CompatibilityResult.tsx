@@ -9,6 +9,7 @@ import {
 import { Favorite as FavoriteIcon } from '@mui/icons-material';
 import { AnalysisResult, Language } from '../types';
 import { ResultCard } from './ResultCard';
+import { PythagorasGrid } from './PythagorasGrid';
 import { zodiacEmoji, chineseZodiacEmoji } from '../constants/translations';
 import { translateZodiac, translateChineseZodiac } from '../utils/translations';
 
@@ -32,12 +33,12 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
             <Grid container spacing={4} sx={{ mb: 4 }}>
                 {/* Partner 1 Summary */}
                 <Grid item xs={12} md={6}>
-                    <Card sx={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <Card sx={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(168, 85, 247, 0.2)' }}>
                         <CardContent>
-                            <Typography variant="h6" gutterBottom color="primary.light">
+                            <Typography variant="h6" gutterBottom color="primary.light" sx={{ textAlign: 'center', mb: 2 }}>
                                 {translations.partner1}
                             </Typography>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={2} sx={{ mb: 3 }}>
                                 <Grid item xs={6}>
                                     <ResultCard
                                         title={translations.zodiac}
@@ -53,18 +54,23 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                                     />
                                 </Grid>
                             </Grid>
+                            <Divider sx={{ my: 2, opacity: 0.1 }} />
+                            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2, fontWeight: 600 }}>
+                                {translations.pythagoras}
+                            </Typography>
+                            <PythagorasGrid square={p1.pythagoras.square} />
                         </CardContent>
                     </Card>
                 </Grid>
 
                 {/* Partner 2 Summary */}
                 <Grid item xs={12} md={6}>
-                    <Card sx={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <Card sx={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(236, 72, 153, 0.2)' }}>
                         <CardContent>
-                            <Typography variant="h6" gutterBottom color="secondary.light">
+                            <Typography variant="h6" gutterBottom color="secondary.light" sx={{ textAlign: 'center', mb: 2 }}>
                                 {translations.partner2}
                             </Typography>
-                            <Grid container spacing={2}>
+                            <Grid container spacing={2} sx={{ mb: 3 }}>
                                 <Grid item xs={6}>
                                     <ResultCard
                                         title={translations.zodiac}
@@ -80,6 +86,11 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                                     />
                                 </Grid>
                             </Grid>
+                            <Divider sx={{ my: 2, opacity: 0.1 }} />
+                            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2, fontWeight: 600 }}>
+                                {translations.pythagoras}
+                            </Typography>
+                            <PythagorasGrid square={p2.pythagoras.square} />
                         </CardContent>
                     </Card>
                 </Grid>
@@ -117,7 +128,23 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                                 color: 'rgba(255,255,255,0.9)',
                             },
                             '& ul': { mb: 3, pl: 2 },
-                            '& li': { mb: 1, color: 'rgba(255,255,255,0.8)' }
+                            '& li': { mb: 1, color: 'rgba(255,255,255,0.8)' },
+                            '& table': {
+                                width: '100%',
+                                maxWidth: '300px',
+                                margin: '20px auto',
+                                borderCollapse: 'collapse',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                '& td': {
+                                    border: '1px solid rgba(255,255,255,0.2)',
+                                    padding: '10px',
+                                    textAlign: 'center',
+                                    width: '33.33%',
+                                    aspectRatio: '1/1',
+                                    color: '#fff',
+                                    fontWeight: 'bold'
+                                }
+                            }
                         }}
                     />
                 </CardContent>
