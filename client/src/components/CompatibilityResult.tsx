@@ -6,7 +6,10 @@ import {
     Grid,
     Divider
 } from '@mui/material';
-import { Favorite as FavoriteIcon } from '@mui/icons-material';
+import {
+    Calculate as CalculateIcon,
+    Favorite as FavoriteIcon
+} from '@mui/icons-material';
 import { AnalysisResult, Language } from '../types';
 import { ResultCard } from './ResultCard';
 import { PythagorasGrid } from './PythagorasGrid';
@@ -38,7 +41,7 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                             <Typography variant="h6" gutterBottom color="primary.light" sx={{ textAlign: 'center', mb: 2 }}>
                                 {translations.partner1}
                             </Typography>
-                            <Grid container spacing={2} sx={{ mb: 3 }}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={6}>
                                     <ResultCard
                                         title={translations.zodiac}
@@ -54,11 +57,6 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                                     />
                                 </Grid>
                             </Grid>
-                            <Divider sx={{ my: 2, opacity: 0.1 }} />
-                            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2, fontWeight: 600 }}>
-                                {translations.pythagoras}
-                            </Typography>
-                            <PythagorasGrid square={p1.pythagoras.square} />
                         </CardContent>
                     </Card>
                 </Grid>
@@ -70,7 +68,7 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                             <Typography variant="h6" gutterBottom color="secondary.light" sx={{ textAlign: 'center', mb: 2 }}>
                                 {translations.partner2}
                             </Typography>
-                            <Grid container spacing={2} sx={{ mb: 3 }}>
+                            <Grid container spacing={2}>
                                 <Grid item xs={6}>
                                     <ResultCard
                                         title={translations.zodiac}
@@ -86,11 +84,34 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                                     />
                                 </Grid>
                             </Grid>
-                            <Divider sx={{ my: 2, opacity: 0.1 }} />
-                            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', mb: 2, fontWeight: 600 }}>
-                                {translations.pythagoras}
-                            </Typography>
-                            <PythagorasGrid square={p2.pythagoras.square} />
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                {/* Pythagoras Comparison */}
+                <Grid item xs={12}>
+                    <Card sx={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <CardContent sx={{ p: { xs: 2, md: 4 } }}>
+                            <Box sx={{ textAlign: 'center', mb: 4 }}>
+                                <CalculateIcon sx={{ fontSize: 50, color: 'primary.main', mb: 1 }} />
+                                <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                    {translations.pythagoras} Comparison
+                                </Typography>
+                            </Box>
+                            <Grid container spacing={4} justifyContent="center">
+                                <Grid item xs={12} sm={6} md={5}>
+                                    <Typography variant="subtitle1" sx={{ textAlign: 'center', mb: 1, color: 'primary.light', fontWeight: 600 }}>
+                                        {translations.partner1}
+                                    </Typography>
+                                    <PythagorasGrid square={p1.pythagoras.square} />
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={5}>
+                                    <Typography variant="subtitle1" sx={{ textAlign: 'center', mb: 1, color: 'secondary.light', fontWeight: 600 }}>
+                                        {translations.partner2}
+                                    </Typography>
+                                    <PythagorasGrid square={p2.pythagoras.square} />
+                                </Grid>
+                            </Grid>
                         </CardContent>
                     </Card>
                 </Grid>
