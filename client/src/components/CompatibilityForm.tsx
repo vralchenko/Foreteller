@@ -93,7 +93,13 @@ const PartnerFields: React.FC<{
                 <DatePicker
                     label={translations.dob}
                     value={data.date ? dayjs(data.date) : null}
-                    onChange={(date) => onChange('date', date?.format('YYYY-MM-DD'))}
+                    onChange={(date) => {
+                        if (!date) {
+                            onChange('date', '');
+                        } else if (date.isValid()) {
+                            onChange('date', date.format('YYYY-MM-DD'));
+                        }
+                    }}
                     maxDate={dayjs()}
                     format="DD.MM.YYYY"
                     slotProps={{ textField: { fullWidth: true } }}

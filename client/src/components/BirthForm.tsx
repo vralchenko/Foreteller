@@ -161,7 +161,13 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     };
 
     const handleDateChange = (date: Dayjs | null) => {
-        if (date) {
+        if (!date) {
+            onChange({ target: { name: 'date', value: '' } });
+            return;
+        }
+
+        // Only update the state if the date is valid to avoid jumping/Invalid Date string
+        if (date.isValid()) {
             onChange({ target: { name: 'date', value: date.format('YYYY-MM-DD') } });
         }
     };
