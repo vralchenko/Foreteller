@@ -1,4 +1,6 @@
 import { Moon } from 'lunarphase-js';
+import { Solar } from 'lunar-typescript';
+
 
 export function getZodiacSign(dateStr: string): string {
     const date = new Date(dateStr);
@@ -20,15 +22,35 @@ export function getZodiacSign(dateStr: string): string {
     return "Unknown";
 }
 
+const CHINESE_ZODIAC_MAP: Record<string, string> = {
+    "鼠": "Rat",
+    "牛": "Ox",
+    "虎": "Tiger",
+    "兔": "Rabbit",
+    "龙": "Dragon",
+    "蛇": "Snake",
+    "马": "Horse",
+    "羊": "Goat",
+    "猴": "Monkey",
+    "鸡": "Rooster",
+    "狗": "Dog",
+    "猪": "Pig"
+};
+
 export function getChineseZodiac(dateStr: string): string {
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const animals = [
-        "Monkey", "Rooster", "Dog", "Pig",
-        "Rat", "Ox", "Tiger", "Rabbit",
-        "Dragon", "Snake", "Horse", "Goat"
-    ];
-    return animals[year % 12];
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return "Unknown";
+
+        const solar = Solar.fromDate(date);
+        const lunar = solar.getLunar();
+        const shengXiao = lunar.getYearShengXiao();
+
+        return CHINESE_ZODIAC_MAP[shengXiao] || "Unknown";
+    } catch (e) {
+        console.error('Chinese Zodiac calculation error:', e);
+        return "Unknown";
+    }
 }
 
 interface PythagorasResult {
