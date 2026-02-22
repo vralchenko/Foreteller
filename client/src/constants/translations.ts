@@ -41,7 +41,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Listen Analysis',
         stopAudio: 'Stop Listening',
         translating: 'Translating...',
-        fillAll: 'Please fill in all fields'
+        fillAll: 'Please fill in all fields',
+        compatibilityMode: 'Compatibility',
+        analysisMode: 'Personal Analysis',
+        partner1: 'Partner 1',
+        partner2: 'Partner 2',
+        checkCompatibility: 'Check Compatibility'
     },
     de: {
         title: 'Foreteller',
@@ -65,7 +70,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Analyse anhören',
         stopAudio: 'Zuhören beenden',
         translating: 'Übersetzen...',
-        fillAll: 'Bitte füllen Sie alle Felder aus'
+        fillAll: 'Bitte füllen Sie alle Felder aus',
+        compatibilityMode: 'Kompatibilität',
+        analysisMode: 'Persönliche Analyse',
+        partner1: 'Partner 1',
+        partner2: 'Partner 2',
+        checkCompatibility: 'Kompatibilität prüfen'
     },
     fr: {
         title: 'Foreteller',
@@ -89,7 +99,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Écouter l\'analyse',
         stopAudio: 'Arrêter l\'écoute',
         translating: 'Traduction...',
-        fillAll: 'Veuillez remplir tous les champs'
+        fillAll: 'Veuillez remplir tous les champs',
+        compatibilityMode: 'Compatibilité',
+        analysisMode: 'Analyse Personnelle',
+        partner1: 'Partenaire 1',
+        partner2: 'Partenaire 2',
+        checkCompatibility: 'Vérifier la compatibilité'
     },
     es: {
         title: 'Foreteller',
@@ -113,7 +128,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Escuchar análisis',
         stopAudio: 'Detener audio',
         translating: 'Traduciendo...',
-        fillAll: 'Por favor complete todos los campos'
+        fillAll: 'Por favor complete todos los campos',
+        compatibilityMode: 'Compatibilidad',
+        analysisMode: 'Análisis Personal',
+        partner1: 'Pareja 1',
+        partner2: 'Pareja 2',
+        checkCompatibility: 'Comprobar compatibilidad'
     },
     uk: {
         title: 'Foreteller',
@@ -137,7 +157,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Прослухати аналіз',
         stopAudio: 'Зупинити',
         translating: 'Перекладаю...',
-        fillAll: 'Будь ласка, заповніть усі поля'
+        fillAll: 'Будь ласка, заповніть усі поля',
+        compatibilityMode: 'Сумісність',
+        analysisMode: 'Особистий Аналіз',
+        partner1: 'Партнер 1',
+        partner2: 'Партнер 2',
+        checkCompatibility: 'Перевірити сумісність'
     },
     ru: {
         title: 'Foreteller',
@@ -161,7 +186,12 @@ export const TRANSLATIONS = {
         listenAudio: 'Прослушать анализ',
         stopAudio: 'Остановить',
         translating: 'Перевожу...',
-        fillAll: 'Пожалуйста, заполните все поля'
+        fillAll: 'Пожалуйста, заполните все поля',
+        compatibilityMode: 'Совместимость',
+        analysisMode: 'Личный Анализ',
+        partner1: 'Партнер 1',
+        partner2: 'Партнер 2',
+        checkCompatibility: 'Проверить совместимость'
     }
 };
 

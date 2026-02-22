@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 import { calculatePythagoras, getZodiacSign, getChineseZodiac, getMoonPhaseInfo } from './numerology.js';
-import { generateAnalysisPrompt } from './prompts.js';
+import { generateAnalysisPrompt, generateCompatibilityPrompt } from './prompts.js';
+
 
 dotenv.config();
 
@@ -156,7 +157,59 @@ app.post('/api/analyze', async (req: Request<{}, {}, AnalyzeRequest>, res: Respo
     }
 });
 
+app.post('/api/compatibility', async (req: Request, res: Response) => {
+    try {
+        const { partner1, partner2, language = 'uk' } = req.body;
+
+        const getInfo = (data: any) => ({
+            zodiac: getZodiacSign(data.date),
+            chineseZodiac: getChineseZodiac(data.date),
+            pythagoras: calculatePythagoras(data.date),
+            moon: getMoonPhaseInfo(data.date),
+            input: { ...data, language }
+        });
+
+        const info1 = getInfo(partner1);
+        const info2 = getInfo(partner2);
+
+        let aiCompatibility = "";
+
+        if (process.env.GROQ_API_KEY) {
+            const prompt = generateCompatibilityPrompt(info1 as any, info2 as any);
+            const model = process.env.AI_MODEL_NAME || 'llama3-8b-8192';
+            const apiUrl = process.env.GROQ_API_URL || 'https://api.groq.com/openai/v1/chat/completions';
+
+            const response = await axios.post(apiUrl, {
+                model: model,
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.7,
+                max_tokens: 4000
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            aiCompatibility = response.data.choices[0]?.message?.content || "";
+            aiCompatibility = aiCompatibility.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*/g, '');
+        }
+
+        res.json({
+            partner1: info1,
+            partner2: info2,
+            aiCompatibility
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 app.post('/api/translate', async (req: Request, res: Response) => {
+
     try {
         const { text, targetLang } = req.body;
         if (!text || !targetLang) {

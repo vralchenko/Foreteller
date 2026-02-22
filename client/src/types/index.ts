@@ -35,6 +35,17 @@ export interface AnalysisResult {
     };
 }
 
+export interface CompatibilityFormData {
+    partner1: FormData;
+    partner2: FormData;
+}
+
+export interface CompatibilityResult {
+    partner1: AnalysisResult;
+    partner2: AnalysisResult;
+    aiCompatibility: string;
+}
+
 export type Language = 'en' | 'de' | 'fr' | 'es' | 'uk' | 'ru';
 
 export interface Translations {
@@ -59,4 +70,10 @@ export interface Translations {
     listenAudio: string;
     stopAudio: string;
     translating: string;
+    fillAll: string;
+    compatibilityMode: string;
+    analysisMode: string;
+    partner1: string;
+    partner2: string;
+    checkCompatibility: string;
 }

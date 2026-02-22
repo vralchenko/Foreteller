@@ -165,3 +165,50 @@ export function generateAnalysisPrompt(data: PromptData): string {
       - Atmosphere: Premium, mystic, insightful, transformative.
     `;
 }
+export function generateCompatibilityPrompt(p1: PromptData, p2: PromptData): string {
+  let promptLanguage = 'Russian';
+  let headers = {
+    intro: 'Синергия Душ',
+    numerology: 'Нумерологический Резонанс',
+    zodiac: 'Звездное Притяжение',
+    advice: 'Совет Космоса'
+  };
+
+  if (p1.language === 'en') {
+    promptLanguage = 'English';
+    headers = { intro: 'Soul Synergy', numerology: 'Numerical Resonance', zodiac: 'Stellar Attraction', advice: 'Cosmic Advice' };
+  } else if (p1.language === 'uk') {
+    promptLanguage = 'Ukrainian';
+    headers = { intro: 'Синергія Душ', numerology: 'Нумерологічний Резонанс', zodiac: 'Зоряне Тяжіння', advice: 'Порада Космосу' };
+  } else if (p1.language === 'de') {
+    promptLanguage = 'German';
+    headers = { intro: 'Seelensymbiose', numerology: 'Numerische Resonanz', zodiac: 'Stellare Anziehung', advice: 'Kosmischer Rat' };
+  } else if (p1.language === 'es') {
+    promptLanguage = 'Spanish';
+    headers = { intro: 'Sinergia de Almas', numerology: 'Resonancia Numérica', zodiac: 'Atracción Estelar', advice: 'Consejo Cósmico' };
+  } else if (p1.language === 'fr') {
+    promptLanguage = 'French';
+    headers = { intro: 'Synergie des Âmes', numerology: 'Résonance Numérique', zodiac: 'Attraction Stellaire', advice: 'Conseil Cosmique' };
+  }
+
+  return `
+      ACT AS A MASTER ASTROLOGER AND NUMEROLOGIST.
+      Analyze the compatibility between two partners:
+      Partner 1: ${p1.gender}, ${p1.zodiac} (${p1.chineseZodiac}), Pythagoras Square: ${JSON.stringify(p1.pythagoras.square)}
+      Partner 2: ${p2.gender}, ${p2.zodiac} (${p2.chineseZodiac}), Pythagoras Square: ${JSON.stringify(p2.pythagoras.square)}
+      
+      Volume: 400-600 words.
+      Format: HTML (<h3>, <p>, <ul>, <li>, <strong>).
+      Language: ${promptLanguage}.
+      
+      Structure:
+      - <h3>💞 ${headers.intro}</h3>
+        General feeling of the union.
+      - <h3>📐 ${headers.numerology}</h3>
+        How their psychomatrices interact.
+      - <h3>✨ ${headers.zodiac}</h3>
+        Astrological connection.
+      - <h3>🔮 ${headers.advice}</h3>
+        Practical advice for the relationship.
+  `;
+}

@@ -25,17 +25,21 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 import { darkTheme } from './theme';
-import { FormData, AnalysisResult, Language } from './types';
+import { FormData, AnalysisResult, Language, CompatibilityFormData, CompatibilityResult } from './types';
 import { TRANSLATIONS, zodiacEmoji, chineseZodiacEmoji } from './constants/translations';
 import { translateZodiac, translateChineseZodiac } from './utils/translations';
 import { BirthForm } from './components/BirthForm';
 import { ResultCard } from './components/ResultCard';
 import { PythagorasGrid } from './components/PythagorasGrid';
+import { CompatibilityForm } from './components/CompatibilityForm';
+import { CompatibilityResultComponent } from './components/CompatibilityResult';
 
 function App() {
   const [lang, setLang] = useState<Language>('en');
   const t = TRANSLATIONS[lang];
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
+
+  const [mode, setMode] = useState<'analysis' | 'compatibility'>('analysis');
 
   const [formData, setFormData] = useState<FormData>({
     date: '',
@@ -43,13 +47,20 @@ function App() {
     place: '',
     gender: 'male',
   });
+
+  const [compData, setCompData] = useState<CompatibilityFormData>({
+    partner1: { date: '', time: '', place: '', gender: 'male' },
+    partner2: { date: '', time: '', place: '', gender: 'female' },
+  });
+
   const resultsRef = useRef<HTMLDivElement>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [compResult, setCompResult] = useState<CompatibilityResult | null>(null);
+
   const [loading, setLoading] = useState(false);
-  const [isTranslating, setIsTranslating] = useState(false);
+  const [, setIsTranslating] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const isSpeakingRef = useRef(false);
-  const utterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const [error, setError] = useState('');
 
   const [highlightedField, setHighlightedField] = useState<string | null>(null);
@@ -59,10 +70,16 @@ function App() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleCompChange = (partner: 'partner1' | 'partner2', field: string, value: any) => {
+    setCompData({
+      ...compData,
+      [partner]: { ...compData[partner], [field]: value }
+    });
+  };
+
   // --- Presentation API (Playwright-like control) ---
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      // For security, you might want to check event.origin here
       const { type, action, payload } = event.data;
 
       if (type === 'PRESENTATION_COMMAND') {
@@ -77,7 +94,6 @@ function App() {
           setHighlightedField(payload.name);
           setApiMessage(payload.message || null);
           if (payload.name) {
-            // Auto-scroll to field if it's not in view
             const el = document.getElementsByName(payload.name)[0];
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
@@ -92,7 +108,7 @@ function App() {
         }
 
         if (action === 'SUBMIT') {
-          setResult(null); // Clear old results to prevent flashes
+          setResult(null);
           const formElement = document.querySelector('form');
           if (formElement) {
             formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -114,7 +130,6 @@ function App() {
         }
 
         if (action === 'DOWNLOAD_PDF') {
-          // Trigger the existing PDF download function
           handleDownloadPDF();
         }
       }
@@ -122,12 +137,11 @@ function App() {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [lang, result]); // Added dependencies for stable access to stateful functions
+  }, [lang, result]);
 
   // Auto-translate analysis when language changes
   useEffect(() => {
     const translateAnalysis = async () => {
-      // If we have an analysis and the UI language is different from the analysis language
       if (result?.aiAnalysis && result.input?.language !== lang) {
         setIsTranslating(true);
         try {
@@ -170,6 +184,7 @@ function App() {
     setLoading(true);
     setError('');
     setResult(null);
+    setCompResult(null);
     window.speechSynthesis.cancel();
     setIsSpeaking(false);
     isSpeakingRef.current = false;
@@ -195,44 +210,66 @@ function App() {
     }
   };
 
+  const handleCompatibilitySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!compData.partner1.date || !compData.partner2.date) {
+      setError(t.fillAll);
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setResult(null);
+    setCompResult(null);
+
+    try {
+      const response = await fetch('/api/compatibility', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partner1: compData.partner1,
+          partner2: compData.partner2,
+          language: lang
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setCompResult(data);
+      } else {
+        setError(data.error || 'Something went wrong');
+      }
+    } catch (err) {
+      setError(t.error);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleListen = () => {
     const synth = window.speechSynthesis;
-
     if (isSpeaking) {
       synth.cancel();
       setIsSpeaking(false);
       isSpeakingRef.current = false;
       return;
     }
-
     if (!result?.aiAnalysis) return;
 
     try {
-      if (!synth) {
-        throw new Error('Speech synthesis not supported in this browser');
-      }
-
-      // Important: some browsers need voices to be loaded
+      if (!synth) throw new Error('Speech synthesis not supported');
       synth.getVoices();
-
-      // Prepare text
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = result.aiAnalysis;
       let textToSpeak = tempDiv.textContent || tempDiv.innerText || '';
-
-      // Clean text: remove emojis and normalize spaces
-      textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F910}-\u{1F96B}\u{1F980}-\u{1F9E0}]/gu, '');
+      textToSpeak = textToSpeak.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
       textToSpeak = textToSpeak.replace(/\s+/g, ' ').trim();
-
       if (!textToSpeak) return;
 
-      // Mobile/Stability fix: split text into small chunks
       const sentences = textToSpeak.match(/[^.!?]+[.!?]+/g) || [textToSpeak];
-
       setIsSpeaking(true);
       isSpeakingRef.current = true;
-      utterancesRef.current = [];
-
       let currentIdx = 0;
 
       const speakNext = () => {
@@ -243,8 +280,6 @@ function App() {
         }
 
         const utterance = new SpeechSynthesisUtterance(sentences[currentIdx].trim());
-        utterancesRef.current.push(utterance);
-
         const langMap: Record<string, string> = {
           'en': 'en-US', 'ru': 'ru-RU', 'uk': 'uk-UA',
           'de': 'de-DE', 'fr': 'fr-FR', 'es': 'es-ES'
@@ -253,29 +288,18 @@ function App() {
         utterance.lang = targetLang;
         utterance.rate = 1.0;
 
-        // Try to pick a specific voice for the language
         const voices = synth.getVoices();
-        const voice = voices.find(v => v.lang === targetLang) ||
-          voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
-        if (voice) {
-          utterance.voice = voice;
-        }
+        const voice = voices.find(v => v.lang === targetLang) || voices.find(v => v.lang.startsWith(targetLang.split('-')[0]));
+        if (voice) utterance.voice = voice;
 
         utterance.onend = () => {
           currentIdx++;
-          if (isSpeakingRef.current) {
-            speakNext();
-          }
+          if (isSpeakingRef.current) speakNext();
         };
 
         utterance.onerror = (e) => {
-          // 'interrupted' is normal when we stop manually
           if (e.error !== 'interrupted' && isSpeakingRef.current) {
-            console.warn('Speech synthesis error:', e.error);
-            // Don't show the error to user if it's an autoplay/not-allowed issue
-            if (e.error !== 'not-allowed') {
-              setError(`Audio Error: ${e.error}.`);
-            }
+            console.warn('Speech error:', e.error);
             setIsSpeaking(false);
             isSpeakingRef.current = false;
           }
@@ -285,14 +309,13 @@ function App() {
       };
 
       synth.cancel();
-      // Increase timeout for desktop browsers to 100ms
       setTimeout(() => {
-        synth.resume(); // Ensure not stuck in paused state
+        synth.resume();
         speakNext();
       }, 100);
 
     } catch (err: any) {
-      setError(`Audio Feature Error: ${err.message}`);
+      console.error(err);
       setIsSpeaking(false);
       isSpeakingRef.current = false;
     }
@@ -300,7 +323,6 @@ function App() {
 
   const handleDownloadPDF = async () => {
     if (!resultsRef.current) return;
-
     try {
       const canvas = await html2canvas(resultsRef.current, {
         scale: 2,
@@ -308,280 +330,148 @@ function App() {
         logging: false,
         useCORS: true,
       });
-
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfPageHeight = pdf.internal.pageSize.getHeight();
-
-      // --- HEADER WITH BIRTH DATA ---
       const headerHeight = 35;
-      pdf.setFillColor(30, 27, 75); // Same as canvas background
+      pdf.setFillColor(30, 27, 75);
       pdf.rect(0, 0, pdfWidth, headerHeight, 'F');
-
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(255, 255, 255);
       pdf.setFontSize(14);
-
       const genderLabel = formData.gender === 'male' ? t.male : t.female;
-      const birthInfo = `${(t.dob as string).toUpperCase()}: ${formData.date}  |  ${(t.time as string).toUpperCase()}: ${formData.time || '--:--'}  |  ${(t.gender as string).toUpperCase()}: ${genderLabel}`;
-      const birthPlace = `${(t.place as string).toUpperCase()}: ${formData.place}`;
-
+      const birthInfo = `${(t.dob as string).toUpperCase()}: ${formData.date} | ${(t.time as string).toUpperCase()}: ${formData.time || '--:--'} | ${(t.gender as string).toUpperCase()}: ${genderLabel}`;
       pdf.text(birthInfo, 15, 15);
-      pdf.text(birthPlace, 15, 25);
-      pdf.setDrawColor(255, 255, 255, 0.2);
-      pdf.line(15, 28, pdfWidth - 15, 28);
+      pdf.text(`${(t.place as string).toUpperCase()}: ${formData.place}`, 15, 25);
 
       const imgHeightMM = (canvas.height * pdfWidth) / canvas.width;
       let heightLeft = imgHeightMM;
-      let position = headerHeight; // Start image below header
-
-      // Add first page
+      let position = headerHeight;
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
       heightLeft -= (pdfPageHeight - headerHeight);
-
-      // Add subsequent pages if necessary
       while (heightLeft > 0) {
         pdf.addPage();
         position = heightLeft - imgHeightMM;
         pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
         heightLeft -= pdfPageHeight;
       }
-
       pdf.save(`foreteller-${formData.date}.pdf`);
     } catch (error) {
-      console.error('PDF generation error:', error);
+      console.error('PDF error:', error);
     }
   };
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
-        }}
-      >
+      <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)' }}>
         <Box sx={{ flex: 1, pb: 4, overflow: 'auto' }}>
           <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
-            {/* Language Switcher */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-              <ToggleButtonGroup
-                value={lang}
-                exclusive
-                onChange={(_, newLang) => {
-                  if (newLang) {
-                    setLang(newLang);
-                    window.speechSynthesis.cancel();
-                    setIsSpeaking(false);
-                    isSpeakingRef.current = false;
-                  }
-                }}
-                size={isMobile ? 'small' : 'medium'}
-              >
-                <ToggleButton value="en">EN</ToggleButton>
-                <ToggleButton value="de">DE</ToggleButton>
-                <ToggleButton value="fr">FR</ToggleButton>
-                <ToggleButton value="es">ES</ToggleButton>
-                <ToggleButton value="uk">UA</ToggleButton>
-                <ToggleButton value="ru">RU</ToggleButton>
+              <ToggleButtonGroup value={lang} exclusive onChange={(_, newLang) => newLang && setLang(newLang)} size={isMobile ? 'small' : 'medium'}>
+                {['en', 'de', 'fr', 'es', 'uk', 'ru'].map(l => (
+                  <ToggleButton key={l} value={l}>{l.toUpperCase() === 'UK' ? 'UA' : l.toUpperCase()}</ToggleButton>
+                ))}
               </ToggleButtonGroup>
             </Box>
 
-            {/* Header */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <Typography
-                variant="h3"
-                sx={{
-                  fontSize: { xs: '2rem', md: '3.5rem' },
-                  background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 1,
-                }}
-              >
+              <Typography variant="h3" sx={{ fontSize: { xs: '2rem', md: '3.5rem' }, background: 'linear-gradient(to right, #e2e8f0, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', mb: 1 }}>
                 {t.title}
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ letterSpacing: 1 }}>
-                {t.subtitle}
-              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ letterSpacing: 1 }}>{t.subtitle}</Typography>
             </Box>
 
-            {/* Form */}
-            <BirthForm
-              formData={formData}
-              translations={t as any}
-              language={lang}
-              loading={loading}
-              translating={isTranslating}
-              highlightedField={highlightedField}
-              apiMessage={apiMessage}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-            />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+              <ToggleButtonGroup
+                value={mode}
+                exclusive
+                onChange={(_, newMode) => {
+                  if (newMode) {
+                    setMode(newMode);
+                    setError('');
+                    setResult(null);
+                    setCompResult(null);
+                  }
+                }}
+              >
+                <ToggleButton value="analysis">{t.analysisMode}</ToggleButton>
+                <ToggleButton value="compatibility">{t.compatibilityMode}</ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
 
-            {/* Error */}
-            {error && (
-              <Alert severity="error" sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
-                {error}
-              </Alert>
+            {mode === 'analysis' ? (
+              <BirthForm
+                formData={formData}
+                translations={t as any}
+                language={lang}
+                loading={loading}
+                highlightedField={highlightedField}
+                apiMessage={apiMessage}
+                onChange={handleChange}
+                onSubmit={handleSubmit}
+              />
+            ) : (
+              <CompatibilityForm
+                formData={compData}
+                translations={t as any}
+                language={lang}
+                loading={loading}
+                onPartnerChange={handleCompChange}
+                onSubmit={handleCompatibilitySubmit}
+              />
             )}
 
-            {/* Loading */}
-            {loading && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-                <CircularProgress size={60} />
-              </Box>
-            )}
+            {error && <Alert severity="error" sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>{error}</Alert>}
+            {loading && <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}><CircularProgress size={60} /></Box>}
 
-            {/* Results */}
-            {result && (
+            {mode === 'analysis' && result && (
               <Box ref={resultsRef}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, gap: 1 }}>
-                  <Button
-                    variant="outlined"
-                    startIcon={isSpeaking ? <StopIcon /> : <PlayIcon />}
-                    onClick={handleListen}
-                    sx={{ borderRadius: 8, borderColor: 'rgba(255,255,255,0.2)', color: 'white' }}
-                  >
+                  <Button variant="outlined" startIcon={isSpeaking ? <StopIcon /> : <PlayIcon />} onClick={handleListen} sx={{ borderRadius: 8, color: 'white' }}>
                     {isSpeaking ? t.stopAudio : t.listenAudio}
                   </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={<PdfIcon />}
-                    onClick={handleDownloadPDF}
-                    sx={{ borderRadius: 8 }}
-                  >
-                    {t.downloadPdf}
-                  </Button>
+                  <Button variant="contained" startIcon={<PdfIcon />} onClick={handleDownloadPDF} sx={{ borderRadius: 8 }}>{t.downloadPdf}</Button>
                 </Box>
-
                 <Grid container spacing={3}>
-                  {/* Zodiac */}
-                  <Grid item xs={12} sm={6} md={4}>
-                    <ResultCard
-                      title={t.zodiac}
-                      emoji={zodiacEmoji[result.zodiac] || '✨'}
-                      value={translateZodiac(result.zodiac, lang)}
-                    />
-                  </Grid>
-
-                  {/* Chinese Zodiac */}
-                  <Grid item xs={12} sm={6} md={4}>
-                    <ResultCard
-                      title={t.chinese}
-                      emoji={chineseZodiacEmoji[result.chineseZodiac] || '🐉'}
-                      value={translateChineseZodiac(result.chineseZodiac, lang)}
-                    />
-                  </Grid>
-
-                  {/* Moon */}
-                  <Grid item xs={12} sm={6} md={4}>
-                    <ResultCard
-                      title={t.moon}
-                      emoji={result.moon.emoji}
-                      value={result.moon.phase}
-                    />
-                  </Grid>
-
-                  {/* Pythagoras Square */}
+                  <Grid item xs={12} sm={6} md={4}><ResultCard title={t.zodiac} emoji={zodiacEmoji[result.zodiac] || '✨'} value={translateZodiac(result.zodiac, lang)} /></Grid>
+                  <Grid item xs={12} sm={6} md={4}><ResultCard title={t.chinese} emoji={chineseZodiacEmoji[result.chineseZodiac] || '🐉'} value={translateChineseZodiac(result.chineseZodiac, lang)} /></Grid>
+                  <Grid item xs={12} sm={6} md={4}><ResultCard title={t.moon} emoji={result.moon.emoji} value={result.moon.phase} /></Grid>
                   <Grid item xs={12}>
-                    <Card>
-                      <CardContent>
-                        <Box sx={{ textAlign: 'center', mb: 2 }}>
-                          <CalculateIcon sx={{ fontSize: 60, color: 'primary.main' }} />
-                          <Typography variant="h5" sx={{ mt: 1, fontWeight: 600 }}>
-                            {t.pythagoras}
-                          </Typography>
-                        </Box>
-                        <PythagorasGrid square={result.pythagoras.square} />
-                      </CardContent>
-                    </Card>
+                    <Card><CardContent>
+                      <Box sx={{ textAlign: 'center', mb: 2 }}>
+                        <CalculateIcon sx={{ fontSize: 60, color: 'primary.main' }} />
+                        <Typography variant="h5" sx={{ mt: 1, fontWeight: 600 }}>{t.pythagoras}</Typography>
+                      </Box>
+                      <PythagorasGrid square={result.pythagoras.square} />
+                    </CardContent></Card>
                   </Grid>
-
-                  {/* AI Analysis */}
                   <Grid item xs={12}>
-                    <Card sx={{
-                      background: 'rgba(30, 27, 75, 0.4)',
-                      backdropFilter: 'blur(10px)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
-                    }}>
+                    <Card sx={{ background: 'rgba(30, 27, 75, 0.4)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
                       <CardContent sx={{ p: { xs: 2, md: 4 } }}>
-                        <Typography variant="h5" gutterBottom sx={{
-                          fontWeight: 700,
-                          mb: 4,
-                          textAlign: 'center',
-                          textTransform: 'uppercase',
-                          letterSpacing: 2,
-                          color: 'primary.light'
-                        }}>
-                          {t.analysis}
-                        </Typography>
-                        <Box
-                          dangerouslySetInnerHTML={{
-                            __html: result.aiAnalysis || '<p>AI Analysis unavailable</p>',
-                          }}
-                          sx={{
-                            '& h3': {
-                              color: 'secondary.main',
-                              mt: 5,
-                              mb: 2,
-                              fontSize: '1.5rem',
-                              borderBottom: '1px solid rgba(255,255,255,0.1)',
-                              pb: 1,
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 1
-                            },
-                            '& p': {
-                              mb: 3,
-                              lineHeight: 1.8,
-                              fontSize: '1.05rem',
-                              color: 'rgba(255,255,255,0.9)',
-                              textAlign: 'justify'
-                            },
-                            '& ul': {
-                              mb: 4,
-                              pl: 2,
-                              listStyleType: '"✧ "',
-                            },
-                            '& li': {
-                              mb: 1.5,
-                              lineHeight: 1.6,
-                              color: 'rgba(255,255,255,0.85)'
-                            },
-                            '& strong': {
-                              color: 'primary.light',
-                              fontWeight: 600
-                            }
-                          }}
-                        />
+                        <Typography variant="h5" sx={{ fontWeight: 700, mb: 4, textAlign: 'center', textTransform: 'uppercase', color: 'primary.light' }}>{t.analysis}</Typography>
+                        <Box dangerouslySetInnerHTML={{ __html: result.aiAnalysis || '' }} sx={{ '& h3': { color: 'secondary.main', mt: 3, mb: 2 }, '& p': { mb: 2, lineHeight: 1.8 } }} />
                       </CardContent>
                     </Card>
                   </Grid>
                 </Grid>
               </Box>
             )}
+
+            {mode === 'compatibility' && compResult && (
+              <CompatibilityResultComponent
+                p1={compResult.partner1}
+                p2={compResult.partner2}
+                aiCompatibility={compResult.aiCompatibility}
+                lang={lang}
+                translations={t}
+              />
+            )}
           </Container>
         </Box>
-
-        {/* Footer */}
-        <Box
-          component="footer"
-          sx={{
-            py: 1.5,
-            textAlign: 'center',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-            bgcolor: 'transparent',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.6 }}>
-            © 2026 Viktor Ralchenko
-          </Typography>
+        <Box component="footer" sx={{ py: 1.5, textAlign: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.6 }}>© 2026 Viktor Ralchenko</Typography>
         </Box>
       </Box>
     </ThemeProvider>
