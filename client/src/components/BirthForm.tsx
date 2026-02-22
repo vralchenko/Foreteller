@@ -154,6 +154,19 @@ export const BirthForm: React.FC<BirthFormProps> = ({
         };
     }, [inputValue, language]);
 
+    const [localDate, setLocalDate] = useState<Dayjs | null>(formData.date ? dayjs(formData.date) : null);
+
+    useEffect(() => {
+        const parentDate = formData.date ? dayjs(formData.date) : null;
+        if (parentDate && parentDate.isValid()) {
+            if (!localDate || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
+                setLocalDate(parentDate);
+            }
+        } else if (!formData.date && localDate) {
+            setLocalDate(null);
+        }
+    }, [formData.date]);
+
     const handleGenderChange = (_: React.MouseEvent<HTMLElement>, newGender: 'male' | 'female') => {
         if (newGender !== null) {
             onChange({ target: { name: 'gender', value: newGender } });
@@ -161,12 +174,12 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     };
 
     const handleDateChange = (date: Dayjs | null) => {
+        setLocalDate(date);
         if (!date) {
             onChange({ target: { name: 'date', value: '' } });
             return;
         }
 
-        // Only update the state if the date is valid to avoid jumping/Invalid Date string
         if (date.isValid()) {
             onChange({ target: { name: 'date', value: date.format('YYYY-MM-DD') } });
         }
@@ -197,10 +210,9 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 <FieldWrapper name="date">
                                     <DatePicker
                                         label={translations.dob}
-                                        value={formData.date ? dayjs(formData.date) : null}
+                                        value={localDate}
                                         onChange={handleDateChange}
-                                        minDate={dayjs('1900-01-01')}
-                                        maxDate={dayjs()}
+                                        disableFuture
                                         format="DD.MM.YYYY"
                                         slotProps={{
                                             textField: {

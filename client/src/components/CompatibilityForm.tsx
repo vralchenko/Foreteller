@@ -45,6 +45,18 @@ const PartnerFields: React.FC<{
     const [options, setOptions] = useState<string[]>([]);
     const [inputValue, setInputValue] = useState('');
     const [fetchingCities, setFetchingCities] = useState(false);
+    const [localDate, setLocalDate] = useState<dayjs.Dayjs | null>(data.date ? dayjs(data.date) : null);
+
+    useEffect(() => {
+        const parentDate = data.date ? dayjs(data.date) : null;
+        if (parentDate && parentDate.isValid()) {
+            if (!localDate || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
+                setLocalDate(parentDate);
+            }
+        } else if (!data.date && localDate) {
+            setLocalDate(null);
+        }
+    }, [data.date]);
 
     useEffect(() => {
         let active = true;
@@ -92,16 +104,16 @@ const PartnerFields: React.FC<{
             <Grid item xs={12} sm={6}>
                 <DatePicker
                     label={translations.dob}
-                    value={data.date ? dayjs(data.date) : null}
+                    value={localDate}
                     onChange={(date) => {
+                        setLocalDate(date as any);
                         if (!date) {
                             onChange('date', '');
-                        } else if (date.isValid()) {
-                            onChange('date', date.format('YYYY-MM-DD'));
+                        } else if ((date as any).isValid()) {
+                            onChange('date', (date as any).format('YYYY-MM-DD'));
                         }
                     }}
-                    minDate={dayjs('1900-01-01')}
-                    maxDate={dayjs()}
+                    disableFuture
                     format="DD.MM.YYYY"
                     slotProps={{ textField: { fullWidth: true } }}
                 />
