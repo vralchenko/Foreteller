@@ -26,6 +26,70 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FormData, Translations } from '../types';
 
+interface FieldWrapperProps {
+    name: string;
+    children: React.ReactNode;
+    highlightedField?: string | null;
+    apiMessage?: string | null;
+}
+
+const FieldWrapper: React.FC<FieldWrapperProps> = ({ name, children, highlightedField, apiMessage }) => {
+    const highlighted = highlightedField === name;
+    return (
+        <Box sx={{ position: 'relative' }}>
+            <AnimatePresence>
+                {highlighted && apiMessage && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        style={{
+                            position: 'absolute',
+                            top: '-65px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            zIndex: 200,
+                            background: '#fbbf24',
+                            color: '#000',
+                            padding: '8px 16px',
+                            borderRadius: '10px',
+                            fontWeight: 'bold',
+                            fontSize: '0.9rem',
+                            whiteSpace: 'nowrap',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        {apiMessage}
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '-8px',
+                            left: '50%',
+                            marginLeft: '-8px',
+                            width: '16px',
+                            height: '16px',
+                            background: '#fbbf24',
+                            transform: 'rotate(45deg)',
+                            boxShadow: '5px 5px 10px rgba(0,0,0,0.1)'
+                        }} />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+            <div style={{
+                position: 'relative',
+                zIndex: highlighted ? 150 : 1,
+                outline: highlighted ? '3px solid #fbbf24' : 'none',
+                outlineOffset: '2px',
+                boxShadow: highlighted ? '0 0 40px rgba(251, 191, 36, 0.5)' : 'none',
+                borderRadius: '8px',
+                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }}>
+                {children}
+            </div>
+        </Box>
+    );
+};
+
 interface BirthFormProps {
     formData: FormData;
     translations: Translations;
@@ -49,64 +113,6 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     onChange,
     onSubmit,
 }) => {
-    const isHighlighted = (name: string) => highlightedField === name;
-
-    const FieldWrapper: React.FC<{ name: string; children: React.ReactNode }> = ({ name, children }) => {
-        const highlighted = isHighlighted(name);
-        return (
-            <Box sx={{ position: 'relative' }}>
-                <AnimatePresence>
-                    {highlighted && apiMessage && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.8 }}
-                            style={{
-                                position: 'absolute',
-                                top: '-65px',
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                zIndex: 200,
-                                background: '#fbbf24',
-                                color: '#000',
-                                padding: '8px 16px',
-                                borderRadius: '10px',
-                                fontWeight: 'bold',
-                                fontSize: '0.9rem',
-                                whiteSpace: 'nowrap',
-                                boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
-                                pointerEvents: 'none'
-                            }}
-                        >
-                            {apiMessage}
-                            <div style={{
-                                position: 'absolute',
-                                bottom: '-8px',
-                                left: '50%',
-                                marginLeft: '-8px',
-                                width: '16px',
-                                height: '16px',
-                                background: '#fbbf24',
-                                transform: 'rotate(45deg)',
-                                boxShadow: '5px 5px 10px rgba(0,0,0,0.1)'
-                            }} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                <div style={{
-                    position: 'relative',
-                    zIndex: highlighted ? 150 : 1,
-                    outline: highlighted ? '3px solid #fbbf24' : 'none',
-                    outlineOffset: '2px',
-                    boxShadow: highlighted ? '0 0 40px rgba(251, 191, 36, 0.5)' : 'none',
-                    borderRadius: '8px',
-                    transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-                }}>
-                    {children}
-                </div>
-            </Box>
-        );
-    };
 
     const [open, setOpen] = useState(false);
     const [options, setOptions] = useState<string[]>([]);
@@ -159,10 +165,12 @@ export const BirthForm: React.FC<BirthFormProps> = ({
     useEffect(() => {
         const parentDate = formData.date ? dayjs(formData.date) : null;
         if (parentDate && parentDate.isValid()) {
-            if (!localDate || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
+            // Only update local if parent is a different valid date
+            if (!localDate || !localDate.isValid() || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
                 setLocalDate(parentDate);
             }
-        } else if (!formData.date && localDate) {
+        } else if (!formData.date && localDate && localDate.isValid()) {
+            // Only clear local if parent is empty AND local was previously valid
             setLocalDate(null);
         }
     }, [formData.date]);
@@ -207,7 +215,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                     <form onSubmit={onSubmit}>
                         <Grid container spacing={3}>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldWrapper name="date">
+                                <FieldWrapper name="date" highlightedField={highlightedField} apiMessage={apiMessage}>
                                     <DatePicker
                                         label={translations.dob}
                                         value={localDate}
@@ -224,7 +232,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 </FieldWrapper>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldWrapper name="time">
+                                <FieldWrapper name="time" highlightedField={highlightedField} apiMessage={apiMessage}>
                                     <TimePicker
                                         label={translations.time}
                                         value={formData.time ? dayjs(`2000-01-01T${formData.time}`) : null}
@@ -240,7 +248,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 </FieldWrapper>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldWrapper name="place">
+                                <FieldWrapper name="place" highlightedField={highlightedField} apiMessage={apiMessage}>
                                     <Autocomplete
                                         freeSolo
                                         open={open}
@@ -289,7 +297,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 </FieldWrapper>
                             </Grid>
                             <Grid item xs={12} sm={6} md={3}>
-                                <FieldWrapper name="gender">
+                                <FieldWrapper name="gender" highlightedField={highlightedField} apiMessage={apiMessage}>
                                     <ToggleButtonGroup
                                         value={formData.gender}
                                         exclusive
@@ -326,7 +334,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                 </FieldWrapper>
                             </Grid>
                             <Grid item xs={12}>
-                                <FieldWrapper name="submit">
+                                <FieldWrapper name="submit" highlightedField={highlightedField} apiMessage={apiMessage}>
                                     <Button
                                         fullWidth
                                         variant="contained"

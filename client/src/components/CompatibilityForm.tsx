@@ -50,10 +50,10 @@ const PartnerFields: React.FC<{
     useEffect(() => {
         const parentDate = data.date ? dayjs(data.date) : null;
         if (parentDate && parentDate.isValid()) {
-            if (!localDate || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
+            if (!localDate || !localDate.isValid() || parentDate.format('YYYY-MM-DD') !== localDate.format('YYYY-MM-DD')) {
                 setLocalDate(parentDate);
             }
-        } else if (!data.date && localDate) {
+        } else if (!data.date && localDate && localDate.isValid()) {
             setLocalDate(null);
         }
     }, [data.date]);
