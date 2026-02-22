@@ -152,18 +152,34 @@ export const CompatibilityResultComponent: React.FC<CompatibilityResultProps> = 
                             '& li': { mb: 1, color: 'rgba(255,255,255,0.8)' },
                             '& table': {
                                 width: '100%',
-                                maxWidth: '300px',
-                                margin: '20px auto',
-                                borderCollapse: 'collapse',
-                                border: '1px solid rgba(255,255,255,0.2)',
+                                maxWidth: '320px',
+                                margin: '24px auto',
+                                borderCollapse: 'separate',
+                                borderSpacing: '8px',
                                 '& td': {
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    padding: '10px',
+                                    background: 'radial-gradient(circle at center, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                                    border: '1px solid rgba(168, 85, 247, 0.3)',
+                                    borderRadius: '12px',
+                                    padding: '12px',
                                     textAlign: 'center',
                                     width: '33.33%',
                                     aspectRatio: '1/1',
-                                    color: '#fff',
-                                    fontWeight: 'bold'
+                                    color: '#e9d5ff',
+                                    fontWeight: '700',
+                                    fontSize: '1.1rem',
+                                    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+                                    transition: 'transform 0.2s ease',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        borderColor: 'rgba(168, 85, 247, 0.6)'
+                                    }
+                                },
+                                // Target "empty" cells (often represented as '—' or '0')
+                                '& td:contains("—"), & td:contains("0")': {
+                                    background: 'transparent',
+                                    borderColor: 'rgba(255,255,255,0.05)',
+                                    color: 'rgba(255,255,255,0.15)',
+                                    boxShadow: 'none'
                                 }
                             }
                         }}
