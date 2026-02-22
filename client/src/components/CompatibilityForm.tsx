@@ -100,6 +100,7 @@ const PartnerFields: React.FC<{
                             onChange('date', date.format('YYYY-MM-DD'));
                         }
                     }}
+                    minDate={dayjs('1900-01-01')}
                     maxDate={dayjs()}
                     format="DD.MM.YYYY"
                     slotProps={{ textField: { fullWidth: true } }}

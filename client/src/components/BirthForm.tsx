@@ -199,6 +199,7 @@ export const BirthForm: React.FC<BirthFormProps> = ({
                                         label={translations.dob}
                                         value={formData.date ? dayjs(formData.date) : null}
                                         onChange={handleDateChange}
+                                        minDate={dayjs('1900-01-01')}
                                         maxDate={dayjs()}
                                         format="DD.MM.YYYY"
                                         slotProps={{
