@@ -475,7 +475,7 @@ function App() {
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 0.5 }}>
             <Typography component="a" href="mailto:vralchenko@gmail.com" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>vralchenko@gmail.com</Typography>
             <Typography component="a" href="https://www.linkedin.com/in/victoralchenko/" target="_blank" rel="noopener noreferrer" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>LinkedIn</Typography>
-            <Typography component="a" href="https://github.com/vralchenko" target="_blank" rel="noopener noreferrer" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>GitHub</Typography>
+            <Typography component="a" href="https://vralchenko-portfolio.vercel.app/en" target="_blank" rel="noopener noreferrer" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>Portfolio</Typography>
           </Box>
         </Box>
       </Box>
