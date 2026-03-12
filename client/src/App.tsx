@@ -472,6 +472,11 @@ function App() {
         </Box>
         <Box component="footer" sx={{ py: 1.5, textAlign: 'center', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.6 }}>© 2026 Viktor Ralchenko</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 0.5 }}>
+            <Typography component="a" href="mailto:vralchenko@gmail.com" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>vralchenko@gmail.com</Typography>
+            <Typography component="a" href="https://www.linkedin.com/in/victoralchenko/" target="_blank" rel="noopener noreferrer" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>LinkedIn</Typography>
+            <Typography component="a" href="https://github.com/vralchenko" target="_blank" rel="noopener noreferrer" variant="caption" color="text.secondary" sx={{ opacity: 0.5, textDecoration: 'none', '&:hover': { opacity: 0.8 } }}>GitHub</Typography>
+          </Box>
         </Box>
       </Box>
     </ThemeProvider>
