@@ -30,3 +30,6 @@ Thumbs.db
 *.tgz
 .npm
 .eslintcache
+.vercel
+.wrangler
+public/

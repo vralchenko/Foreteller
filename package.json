@@ -3,6 +3,19 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "build": "cd client && npm install --legacy-peer-deps && npm run build && mv dist ../public"
+        "build": "cd client && npm install --legacy-peer-deps && npm run build && mv dist ../public",
+        "dev:client": "cd client && npm run dev",
+        "dev:api": "cd api && npm run dev",
+        "deploy": "npm run build && wrangler pages deploy",
+        "preview": "npm run build && wrangler pages dev"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.91.0",
+        "lunar-typescript": "^1.8.6",
+        "lunarphase-js": "^2.0.1"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.0.0",
+        "wrangler": "^3.0.0"
     }
 }
