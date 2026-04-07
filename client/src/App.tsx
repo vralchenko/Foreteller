@@ -27,7 +27,7 @@ import html2canvas from 'html2canvas';
 import { darkTheme } from './theme';
 import { FormData, AnalysisResult, Language, CompatibilityFormData, CompatibilityResult } from './types';
 import { TRANSLATIONS, zodiacEmoji, chineseZodiacEmoji } from './constants/translations';
-import { translateZodiac, translateChineseZodiac } from './utils/translations';
+import { translateZodiac, translateChineseZodiac, translateMoonPhase } from './utils/translations';
 import { BirthForm } from './components/BirthForm';
 import { ResultCard } from './components/ResultCard';
 import { PythagorasGrid } from './components/PythagorasGrid';
@@ -324,32 +324,31 @@ function App() {
   const handleDownloadPDF = async () => {
     if (!resultsRef.current) return;
     try {
+      const genderLabel = formData.gender === 'male' ? t.male : t.female;
+      const headerDiv = document.createElement('div');
+      headerDiv.style.cssText = 'background:#1e1b4b;color:#fff;padding:20px 24px;font-family:sans-serif;font-size:18px;font-weight:bold;line-height:1.8;';
+      headerDiv.innerHTML = `${(t.dob as string).toUpperCase()}: ${formData.date} | ${(t.time as string).toUpperCase()}: ${formData.time || '--:--'} | ${(t.gender as string).toUpperCase()}: ${genderLabel}<br>${(t.place as string).toUpperCase()}: ${formData.place}`;
+      resultsRef.current.prepend(headerDiv);
+
       const canvas = await html2canvas(resultsRef.current, {
         scale: 2,
         backgroundColor: '#1e1b4b',
         logging: false,
         useCORS: true,
       });
+
+      headerDiv.remove();
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfPageHeight = pdf.internal.pageSize.getHeight();
-      const headerHeight = 35;
-      pdf.setFillColor(30, 27, 75);
-      pdf.rect(0, 0, pdfWidth, headerHeight, 'F');
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFontSize(14);
-      const genderLabel = formData.gender === 'male' ? t.male : t.female;
-      const birthInfo = `${(t.dob as string).toUpperCase()}: ${formData.date} | ${(t.time as string).toUpperCase()}: ${formData.time || '--:--'} | ${(t.gender as string).toUpperCase()}: ${genderLabel}`;
-      pdf.text(birthInfo, 15, 15);
-      pdf.text(`${(t.place as string).toUpperCase()}: ${formData.place}`, 15, 25);
 
       const imgHeightMM = (canvas.height * pdfWidth) / canvas.width;
       let heightLeft = imgHeightMM;
-      let position = headerHeight;
+      let position = 0;
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeightMM);
-      heightLeft -= (pdfPageHeight - headerHeight);
+      heightLeft -= pdfPageHeight;
       while (heightLeft > 0) {
         pdf.addPage();
         position = heightLeft - imgHeightMM;
@@ -437,7 +436,7 @@ function App() {
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6} md={4}><ResultCard title={t.zodiac} emoji={zodiacEmoji[result.zodiac] || '✨'} value={translateZodiac(result.zodiac, lang)} /></Grid>
                   <Grid item xs={12} sm={6} md={4}><ResultCard title={t.chinese} emoji={chineseZodiacEmoji[result.chineseZodiac] || '🐉'} value={translateChineseZodiac(result.chineseZodiac, lang)} /></Grid>
-                  <Grid item xs={12} sm={6} md={4}><ResultCard title={t.moon} emoji={result.moon.emoji} value={result.moon.phase} /></Grid>
+                  <Grid item xs={12} sm={6} md={4}><ResultCard title={t.moon} emoji={result.moon.emoji} value={translateMoonPhase(result.moon.phase, lang)} /></Grid>
                   <Grid item xs={12}>
                     <Card><CardContent>
                       <Box sx={{ textAlign: 'center', mb: 2 }}>

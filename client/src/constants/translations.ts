@@ -201,6 +201,15 @@ export const zodiacEmoji: Record<string, string> = {
     'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓'
 };
 
+export const MOON_PHASE_TRANSLATIONS: Record<Language, Record<string, string>> = {
+    en: { "New": "New Moon", "Waxing Crescent": "Waxing Crescent", "First Quarter": "First Quarter", "Waxing Gibbous": "Waxing Gibbous", "Full": "Full Moon", "Waning Gibbous": "Waning Gibbous", "Last Quarter": "Last Quarter", "Waning Crescent": "Waning Crescent" },
+    ru: { "New": "Новолуние", "Waxing Crescent": "Растущий серп", "First Quarter": "Первая четверть", "Waxing Gibbous": "Растущая Луна", "Full": "Полнолуние", "Waning Gibbous": "Убывающая Луна", "Last Quarter": "Последняя четверть", "Waning Crescent": "Убывающий серп" },
+    uk: { "New": "Новий Місяць", "Waxing Crescent": "Молодик", "First Quarter": "Перша чверть", "Waxing Gibbous": "Зростаючий Місяць", "Full": "Повний Місяць", "Waning Gibbous": "Спадний Місяць", "Last Quarter": "Остання чверть", "Waning Crescent": "Старий Місяць" },
+    de: { "New": "Neumond", "Waxing Crescent": "Zunehmende Sichel", "First Quarter": "Erstes Viertel", "Waxing Gibbous": "Zunehmender Mond", "Full": "Vollmond", "Waning Gibbous": "Abnehmender Mond", "Last Quarter": "Letztes Viertel", "Waning Crescent": "Abnehmende Sichel" },
+    es: { "New": "Luna Nueva", "Waxing Crescent": "Creciente", "First Quarter": "Cuarto Creciente", "Waxing Gibbous": "Gibosa Creciente", "Full": "Luna Llena", "Waning Gibbous": "Gibosa Menguante", "Last Quarter": "Cuarto Menguante", "Waning Crescent": "Menguante" },
+    fr: { "New": "Nouvelle Lune", "Waxing Crescent": "Premier Croissant", "First Quarter": "Premier Quartier", "Waxing Gibbous": "Gibbeuse Croissante", "Full": "Pleine Lune", "Waning Gibbous": "Gibbeuse Décroissante", "Last Quarter": "Dernier Quartier", "Waning Crescent": "Dernier Croissant" }
+};
+
 export const chineseZodiacEmoji: Record<string, string> = {
     'Rat': '🐀', 'Ox': '🐂', 'Tiger': '🐅', 'Rabbit': '🐇',
     'Dragon': '🐉', 'Snake': '🐍', 'Horse': '🐎', 'Goat': '🐐',
