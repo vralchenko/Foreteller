@@ -166,6 +166,7 @@ app.post('/api/compatibility', async (req: Request, res: Response) => {
             chineseZodiac: getChineseZodiac(data.date),
             pythagoras: calculatePythagoras(data.date),
             moon: getMoonPhaseInfo(data.date),
+            language,
             input: { ...data, language }
         });
 
