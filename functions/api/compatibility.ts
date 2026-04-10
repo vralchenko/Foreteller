@@ -19,6 +19,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
             chineseZodiac: getChineseZodiac(data.date),
             pythagoras: calculatePythagoras(data.date),
             moon: getMoonPhaseInfo(data.date),
+            language,
             input: { ...data, language }
         });
 
